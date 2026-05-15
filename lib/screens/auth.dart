@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:snackbert/screens/tabs.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
 
 // Screen to manage login/signup with google
@@ -23,8 +24,6 @@ class _AuthScreenState extends State<AuthScreen> {
     final headlineStyle = theme.textTheme.headlineLarge!.copyWith(
       color: colors.primary,
     );
-
-    ///
 
     return Scaffold(
       backgroundColor: colors.surface,
@@ -54,6 +53,16 @@ class _AuthScreenState extends State<AuthScreen> {
             InfoBracket(
               icon: Icon(Icons.sentiment_very_satisfied_outlined),
               text: "Snackbert ist und bleibt lieb - hier judged dich niemand.",
+            ),
+            SizedBox(height: 16),
+            ElevatedButton.icon(
+              // TODO Authentification with google through firebase
+              // vorher einfach weiterleiten zum nächsten Screen
+              onPressed: () => Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (context) => const TabsScreen()),
+              ),
+              icon: Icon(Icons.login_rounded),
+              label: Text("Login mit Google"),
             ),
           ],
         ),

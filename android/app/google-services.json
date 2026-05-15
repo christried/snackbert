@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "485628385430",
+    "project_id": "snackbert-christried",
+    "storage_bucket": "snackbert-christried.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:485628385430:android:059dd4e99e8499cc2ecab7",
+        "android_client_info": {
+          "package_name": "com.example.snackbert"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "485628385430-msbug02lhhmrbqq437hghtl5r0rf6srt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBkEdBVpb4PMIKXBqNLN9VtHzphK1GGUwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "485628385430-msbug02lhhmrbqq437hghtl5r0rf6srt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
