@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "485628385430-u3r9moh29116sag35vmunq08geso7tev.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.snackbert",
+            "certificate_hash": "3b37f9b272bcd62eda7a4f5ea28a984c6079c92b"
+          }
+        },
+        {
           "client_id": "485628385430-msbug02lhhmrbqq437hghtl5r0rf6srt.apps.googleusercontent.com",
           "client_type": 3
         }

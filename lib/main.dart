@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:google_fonts/google_fonts.dart';
+import 'package:snackbert/services/auth_service.dart';
 import 'firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 
@@ -11,12 +12,14 @@ void main() async {
 
   // 2. Pass the CLI configuration details here
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  final authService = AuthService();
 
-  runApp(Snackbert());
+  runApp(Snackbert(authService: authService));
 }
 
 class Snackbert extends StatelessWidget {
-  const Snackbert({super.key});
+  const Snackbert({super.key, required this.authService});
+  final AuthService authService;
 
   @override
   Widget build(BuildContext context) {
@@ -50,8 +53,15 @@ class Snackbert extends StatelessWidget {
             minimumSize: const Size(240, 64),
           ),
         ),
+        // ICON BUTTONS
+        iconButtonTheme: IconButtonThemeData(
+          style: ButtonStyle(
+            backgroundColor: const WidgetStatePropertyAll(Colors.transparent),
+            foregroundColor: const WidgetStatePropertyAll(Colors.black),
+          ),
+        ),
       ),
-      home: AuthScreen(),
+      home: AuthScreen(authService: authService),
     );
   }
 }
