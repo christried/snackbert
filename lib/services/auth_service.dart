@@ -15,9 +15,15 @@ class AuthService extends ChangeNotifier {
 
   bool get isSignedIn => _user != null;
 
+  bool _initialized = false;
   bool _suppressAutoSignIn = false;
 
   void initialize() {
+    if (_initialized) {
+      return;
+    }
+    _initialized = true;
+
     final signIn = GoogleSignIn.instance;
 
     unawaited(
@@ -54,6 +60,7 @@ class AuthService extends ChangeNotifier {
   }
 
   Future<void> signOut() async {
+    _suppressAutoSignIn = true;
     await GoogleSignIn.instance.signOut();
   }
 
@@ -64,8 +71,6 @@ class AuthService extends ChangeNotifier {
       GoogleSignInAuthenticationEventSignIn() => event.user,
       GoogleSignInAuthenticationEventSignOut() => null,
     };
-
-    _suppressAutoSignIn = true;
 
     notifyListeners();
   }
