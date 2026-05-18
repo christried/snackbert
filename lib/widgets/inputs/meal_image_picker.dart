@@ -45,8 +45,8 @@ class _MealImagePickerState extends State<MealImagePicker> {
 
     Widget content = TextButton.icon(
       onPressed: _takePicture,
-      icon: const Icon(Icons.camera),
-      label: Text("Mach ein Bild!", style: bodyLarge),
+      icon: const Icon(Icons.camera, size: 40),
+      label: Text("Bild machen", style: bodyLarge),
     );
 
     if (_selectedImage != null) {
@@ -69,13 +69,13 @@ class _MealImagePickerState extends State<MealImagePicker> {
       decoration: BoxDecoration(
         color: colors.primaryContainer.withAlpha(155),
         border: Border.all(
-          width: 5,
+          width: 3,
           color: colors.primary.withAlpha(155),
           style: BorderStyle.solid,
         ),
         borderRadius: BorderRadius.circular(40),
       ),
-      height: 250,
+      height: 200,
       width: double.infinity,
       alignment: Alignment.center,
       child: content,

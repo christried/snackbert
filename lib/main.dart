@@ -43,7 +43,7 @@ class Snackbert extends StatelessWidget {
           ),
           // APP BODY BIG TEXTs
           bodyLarge: GoogleFonts.fredoka(
-            fontSize: 24,
+            fontSize: 20,
             fontWeight: FontWeight.w500,
           ),
         ),

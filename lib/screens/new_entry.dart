@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
+import 'package:snackbert/widgets/inputs/meal_recorder.dart';
 
 class NewEntryScreen extends StatefulWidget {
   const NewEntryScreen({super.key});
@@ -13,8 +15,14 @@ class NewEntryScreen extends StatefulWidget {
 }
 
 class _NewEntryScreenState extends State<NewEntryScreen> {
-  File?
-  _selectedImage; // passed to meal_image_picker to also get it here whenever an image is picked there
+  // passed to meal_image_picker to also get it here whenever an image is picked there
+  File? _selectedImage;
+  File? _recordedAudio;
+
+  void _onSendMeal() {
+    print(_selectedImage);
+    print(_recordedAudio);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +34,25 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
             spacing: 32,
             mainAxisSize: MainAxisSize.min,
             children: [
-              MealImagePicker(onPickImage: (image) => _selectedImage = image),
+              InfoBracket(
+                icon: Icon(Icons.info_outline),
+                text: "Eine Eingabe reicht schon aus.",
+                horMargin: 0,
+              ),
 
-              Text("Audio Aufnahme hier"),
+              MealImagePicker(onPickImage: (image) => _selectedImage = image),
 
               Text("Textinput hier dann"),
 
-              ElevatedButton(onPressed: () {}, child: Text("Meal abschicken")),
+              MealRecorder(
+                onPickAudio: (audioFile) => _recordedAudio = audioFile,
+              ),
+
+              ElevatedButton.icon(
+                icon: Icon(Icons.send),
+                onPressed: _onSendMeal,
+                label: Text("Eintragen"),
+              ),
             ],
           ),
         ),
