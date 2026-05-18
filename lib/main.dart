@@ -65,6 +65,21 @@ class Snackbert extends StatelessWidget {
             foregroundColor: const WidgetStatePropertyAll(Colors.black),
           ),
         ),
+
+        // INPUT DECORATION
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: const Color(0xFFEAF4E2),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide.none,
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(24),
+            borderSide: const BorderSide(color: Color(0xFF80B272), width: 2),
+          ),
+          hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.2)),
+        ),
       ),
       home: AuthScreen(authService: authService),
     );

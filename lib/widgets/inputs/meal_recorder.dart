@@ -205,13 +205,13 @@ class _MealRecorderState extends State<MealRecorder> {
       decoration: BoxDecoration(
         color: colors.primaryContainer.withAlpha(155),
         border: Border.all(
-          width: 3,
+          width: 2,
           color: colors.primary.withAlpha(155),
           style: BorderStyle.solid,
         ),
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(16),
       ),
-      height: 100,
+      height: 70,
       width: double.infinity,
       alignment: Alignment.center,
       child: Column(mainAxisSize: MainAxisSize.min, children: [content]),

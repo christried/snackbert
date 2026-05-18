@@ -54,7 +54,7 @@ class _MealImagePickerState extends State<MealImagePicker> {
         onTap: _takePicture,
         child: Container(
           clipBehavior: Clip.hardEdge,
-          decoration: BoxDecoration(borderRadius: BorderRadius.circular(32)),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(12)),
           child: Image.file(
             _selectedImage!,
             fit: BoxFit.cover,
@@ -69,11 +69,11 @@ class _MealImagePickerState extends State<MealImagePicker> {
       decoration: BoxDecoration(
         color: colors.primaryContainer.withAlpha(155),
         border: Border.all(
-          width: 3,
+          width: 2,
           color: colors.primary.withAlpha(155),
           style: BorderStyle.solid,
         ),
-        borderRadius: BorderRadius.circular(40),
+        borderRadius: BorderRadius.circular(16),
       ),
       height: 200,
       width: double.infinity,
