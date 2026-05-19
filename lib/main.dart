@@ -80,6 +80,15 @@ class Snackbert extends StatelessWidget {
           ),
           hintStyle: TextStyle(color: Colors.black.withValues(alpha: 0.2)),
         ),
+
+        // SNACKBAR
+        snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
       ),
       home: AuthScreen(authService: authService),
     );

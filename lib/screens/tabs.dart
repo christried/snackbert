@@ -1,24 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/screens/auth.dart';
 import 'package:snackbert/screens/new_entry.dart';
 import 'package:snackbert/screens/overview.dart';
 import 'package:snackbert/services/auth_service.dart';
 
-// basically the "surroundings" containing the appbar, bottomnavigationbar and (maybe if necessary in the future) a drawer
-// has a dynamic title in appbar depending on active screen
-// has bottomnavigationbar with 2 options: "Eintragen" and "Übersicht"
-
-class TabsScreen extends StatefulWidget {
+class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key, required this.authService});
   final AuthService authService;
 
   @override
-  State<TabsScreen> createState() {
+  ConsumerState<TabsScreen> createState() {
     return _TabsScreenState();
   }
 }
 
-class _TabsScreenState extends State<TabsScreen> {
+class _TabsScreenState extends ConsumerState<TabsScreen> {
   @override
   void initState() {
     super.initState();
@@ -62,7 +60,9 @@ class _TabsScreenState extends State<TabsScreen> {
     var activePageTitle = "Neuer Eintrag";
 
     if (_selectedPageIndex == 1) {
-      activePage = OverviewScreen();
+      final meals = ref.watch(mealsProvider);
+
+      activePage = OverviewScreen(meals: meals);
       activePageTitle = "Deine Übersicht";
     }
 
@@ -82,6 +82,7 @@ class _TabsScreenState extends State<TabsScreen> {
         currentIndex: _selectedPageIndex,
         onTap: _selectPage,
         selectedFontSize: 16,
+        selectedItemColor: const Color.fromARGB(183, 0, 0, 0),
         backgroundColor: colors.secondaryContainer,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.add), label: "Eintragen"),

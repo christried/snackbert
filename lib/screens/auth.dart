@@ -25,6 +25,30 @@ class _AuthScreenState extends State<AuthScreen> {
   void _onAuthStateChanged() {
     if (!mounted) return;
 
+    final error = widget.authService.errorMessage;
+    final snackBarColor = Theme.of(context).colorScheme.primary;
+    final snackBarTextStyle = Theme.of(context).textTheme.bodyMedium;
+
+    if (error != null) {
+      final snackBarContent = ListTile(
+        leading: Image.asset(
+          'assets/snackbert_mascot_face_error.png',
+          width: 48,
+          height: 48,
+        ),
+        title: Text(error, style: snackBarTextStyle),
+      );
+
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: snackBarContent,
+          backgroundColor: snackBarColor,
+          padding: EdgeInsets.all(4),
+        ),
+      );
+    }
+
     if (widget.authService.isSignedIn) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
@@ -93,20 +117,6 @@ class _AuthScreenState extends State<AuthScreen> {
           icon: const Icon(Icons.login_rounded),
           label: const Text('Login mit Google'),
         ),
-
-        // TODO -1: Snackbert-Bar daraus machen
-        if (widget.authService.errorMessage != null)
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: Text(
-              widget.authService.errorMessage!,
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-                fontSize: 13,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
       ],
     );
   }
