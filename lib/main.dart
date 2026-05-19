@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:google_fonts/google_fonts.dart';
 import 'package:snackbert/services/auth_service.dart';
@@ -14,7 +15,7 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   final authService = AuthService();
 
-  runApp(Snackbert(authService: authService));
+  runApp(ProviderScope(child: Snackbert(authService: authService)));
 }
 
 class Snackbert extends StatelessWidget {
@@ -88,6 +89,11 @@ class Snackbert extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
+        ),
+
+        // LIST TILES (OVERVIEW)
+        listTileTheme: ListTileThemeData(
+          contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         ),
       ),
       home: AuthScreen(authService: authService),
