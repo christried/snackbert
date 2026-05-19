@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -19,7 +21,7 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
   File? _recordedAudio;
   final _textInputController = TextEditingController();
 
-  // TODO Get this method to a meals provider and then call it from here with this stuff
+  // TODO 1: Get this method to a meals provider and then call it from here with this stuff
   void _onSendMeal() {
     print(_selectedImage);
     print(_recordedAudio);
@@ -52,7 +54,7 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
               children: [
                 InfoBracket(
                   icon: Icon(Icons.info_outline),
-                  text: "Eine Eingabe reicht schon aus.",
+                  text: "Eine Eingabe reicht total aus.",
                   horMargin: 0,
                 ),
 

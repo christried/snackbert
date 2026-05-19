@@ -43,10 +43,17 @@ class _MealImagePickerState extends State<MealImagePicker> {
       color: colors.primary,
     );
 
-    Widget content = TextButton.icon(
-      onPressed: _takePicture,
-      icon: const Icon(Icons.camera, size: 40),
-      label: Text("Bild machen", style: bodyLarge),
+    Widget content = GestureDetector(
+      onTap: _takePicture,
+
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset('assets/snackbert_mascot_cam.png', width: 64, height: 64),
+
+          Text("Bild machen", style: bodyLarge),
+        ],
+      ),
     );
 
     if (_selectedImage != null) {

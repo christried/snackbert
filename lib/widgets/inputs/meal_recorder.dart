@@ -173,14 +173,33 @@ class _MealRecorderState extends State<MealRecorder> {
       color: colors.primary,
     );
 
-    Widget content = TextButton.icon(
-      onPressed: _toggleRecording,
-      icon: Icon(_isRecording ? Icons.stop : Icons.mic, size: 40),
-      label: Text(
-        _isRecording ? 'Aufnahme stoppen' : 'Audio aufnehmen',
-        style: bodyLarge,
-      ),
-    );
+    Widget content;
+    if (_isRecording) {
+      content = TextButton.icon(
+        onPressed: _toggleRecording,
+        icon: Icon(Icons.stop, size: 40),
+        label: Text(
+          _isRecording ? 'Aufnahme stoppen' : 'Audio aufnehmen',
+          style: bodyLarge,
+        ),
+      );
+    } else {
+      content = GestureDetector(
+        onTap: _toggleRecording,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/snackbert_mascot_mic.png',
+              width: 64,
+              height: 64,
+            ),
+
+            Text("Audio aufnehmen", style: bodyLarge),
+          ],
+        ),
+      );
+    }
 
     // Once we have a recording, show playback + re-record actions.
     if (_audioPath != null) {
