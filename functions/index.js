@@ -14,6 +14,7 @@ exports.analyzeMeal = onCall(
     timeoutSeconds: 60,
     memory: "512MiB",
     secrets: [openAiKey],
+    enforceAppCheck: false,
   },
   async (request) => {
     const data = request.data ?? {};
