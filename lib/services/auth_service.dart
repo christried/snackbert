@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService extends ChangeNotifier {
   GoogleSignInAccount? _user;
@@ -59,9 +60,39 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  // necessary to upload stuff to firebase (because i set it in Rules that way)
+  Future<void> _signInToFirebase(GoogleSignInAccount user) async {
+    try {
+      final auth = user.authentication;
+      if (auth.idToken == null) {
+        throw StateError('Google-ID-Token fehlt.');
+      }
+      final credential = GoogleAuthProvider.credential(idToken: auth.idToken);
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      _errorMessage = 'Firebase-Anmeldung fehlgeschlagen: ${e.code}';
+      notifyListeners();
+      await Future.wait([
+        GoogleSignIn.instance.signOut(),
+        FirebaseAuth.instance.signOut(),
+      ]);
+    } catch (e) {
+      _errorMessage = 'Firebase-Anmeldung fehlgeschlagen: $e';
+      notifyListeners();
+      await Future.wait([
+        GoogleSignIn.instance.signOut(),
+        FirebaseAuth.instance.signOut(),
+      ]);
+    }
+  }
+
   Future<void> signOut() async {
     _suppressAutoSignIn = true;
-    await GoogleSignIn.instance.signOut();
+    await Future.wait([
+      GoogleSignIn.instance.signOut(),
+      FirebaseAuth.instance.signOut(),
+    ]);
   }
 
   void _onAuthEvent(GoogleSignInAuthenticationEvent event) {
@@ -71,6 +102,12 @@ class AuthService extends ChangeNotifier {
       GoogleSignInAuthenticationEventSignIn() => event.user,
       GoogleSignInAuthenticationEventSignOut() => null,
     };
+
+    if (event is GoogleSignInAuthenticationEventSignIn) {
+      unawaited(_signInToFirebase(event.user));
+    } else {
+      unawaited(FirebaseAuth.instance.signOut());
+    }
 
     notifyListeners();
   }

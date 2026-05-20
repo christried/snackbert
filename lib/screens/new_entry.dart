@@ -34,7 +34,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     final hasText = trimmedText.isNotEmpty;
 
     if (!hasText && _selectedImage == null && _recordedAudio == null) {
-      _showSnackBar('Bitte Text, Bild oder Audio angeben.');
+      _showSnackBar('Bitte Text, Bild oder Audio angeben.', isError: true);
       return;
     }
 
@@ -63,11 +63,14 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
         'Proteine: ${result.proteins} g',
       );
     } on FirebaseFunctionsException catch (e) {
-      _showSnackBar(e.message ?? 'Fehler beim Senden der Mahlzeit.');
+      _showSnackBar(
+        e.message ?? 'Fehler beim Senden der Mahlzeit.',
+        isError: true,
+      );
     } on ArgumentError catch (e) {
-      _showSnackBar(e.message ?? 'Ungültige Eingabe.');
+      _showSnackBar(e.message ?? 'Ungültige Eingabe.', isError: true);
     } on Exception catch (e) {
-      _showSnackBar('Fehler beim Senden der Mahlzeit: $e');
+      _showSnackBar('Fehler beim Senden der Mahlzeit: $e', isError: true);
     } finally {
       if (mounted) {
         setState(() {
@@ -77,11 +80,30 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     }
   }
 
-  void _showSnackBar(String message) {
+  void _showSnackBar(String message, {bool? isError = false}) {
     if (!mounted) return;
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(SnackBar(content: Text(message)));
+    final snackBarColor = Theme.of(context).colorScheme.primary;
+    final snackBarTextStyle = Theme.of(context).textTheme.bodyMedium;
+
+    final snackBarContent = ListTile(
+      leading: Image.asset(
+        isError!
+            ? 'assets/snackbert_mascot_face_error.png'
+            : 'assets/snackbert_mascot_face.png',
+        width: 48,
+        height: 48,
+      ),
+      title: Text(message, style: snackBarTextStyle),
+    );
+
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: snackBarContent,
+        backgroundColor: snackBarColor,
+        padding: EdgeInsets.all(4),
+      ),
+    );
   }
 
   @override
