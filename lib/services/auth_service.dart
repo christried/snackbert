@@ -8,13 +8,16 @@ class AuthService extends ChangeNotifier {
   GoogleSignInAccount? _user;
   GoogleSignInAccount? get user => _user;
 
+  User? _firebaseUser;
+  StreamSubscription<User?>? _firebaseAuthSub;
+
   String? _errorMessage;
   String? get errorMessage => _errorMessage;
 
   bool _initializing = true;
   bool get isInitializing => _initializing;
 
-  bool get isSignedIn => _user != null;
+  bool get isSignedIn => _firebaseUser != null;
 
   bool _initialized = false;
   bool _suppressAutoSignIn = false;
@@ -24,6 +27,14 @@ class AuthService extends ChangeNotifier {
       return;
     }
     _initialized = true;
+
+    _firebaseUser = FirebaseAuth.instance.currentUser;
+    _firebaseAuthSub ??= FirebaseAuth.instance.authStateChanges().listen((
+      user,
+    ) {
+      _firebaseUser = user;
+      notifyListeners();
+    });
 
     final signIn = GoogleSignIn.instance;
 
@@ -128,5 +139,11 @@ class AuthService extends ChangeNotifier {
         'Google Sign-In ist nicht konfiguriert. Bitte die Einrichtung prüfen.',
       _ => 'Anmeldung fehlgeschlagen (${e.code}): ${e.description}',
     };
+  }
+
+  @override
+  void dispose() {
+    _firebaseAuthSub?.cancel();
+    super.dispose();
   }
 }
