@@ -4,8 +4,10 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
+  firebase_app_check
   firebase_auth
   firebase_core
+  firebase_storage
   permission_handler_windows
   record_windows
 )

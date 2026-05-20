@@ -2,30 +2,86 @@
 
 import 'dart:io';
 
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/providers/meal_analysis_provider.dart';
+
 import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
 import 'package:snackbert/widgets/inputs/meal_recorder.dart';
 
-class NewEntryScreen extends StatefulWidget {
+class NewEntryScreen extends ConsumerStatefulWidget {
   const NewEntryScreen({super.key});
 
   @override
-  State<NewEntryScreen> createState() {
+  ConsumerState<NewEntryScreen> createState() {
     return _NewEntryScreenState();
   }
 }
 
-class _NewEntryScreenState extends State<NewEntryScreen> {
+class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
   File? _selectedImage;
   File? _recordedAudio;
   final _textInputController = TextEditingController();
 
-  // TODO 1: Get this method to a meals provider and then call it from here with this stuff
-  void _onSendMeal() {
-    print(_selectedImage);
-    print(_recordedAudio);
-    print(_textInputController.text);
+  bool _isSending = false;
+
+  Future<void> _onSendMeal() async {
+    if (_isSending) return;
+
+    final trimmedText = _textInputController.text.trim();
+    final hasText = trimmedText.isNotEmpty;
+
+    if (!hasText && _selectedImage == null && _recordedAudio == null) {
+      _showSnackBar('Bitte Text, Bild oder Audio angeben.');
+      return;
+    }
+
+    // to get rid of keyboard
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      _isSending = true;
+    });
+
+    try {
+      final result = await ref
+          .read(mealAnalysisServiceProvider)
+          .analyzeMeal(
+            text: hasText ? trimmedText : null,
+            image: _selectedImage,
+            audio: _recordedAudio,
+          );
+
+      if (!mounted) return;
+
+      _showSnackBar(
+        'Kalorien: ${result.calories} kcal · '
+        'Kohlenhydrate: ${result.carbs} g · '
+        'Fette: ${result.fats} g · '
+        'Proteine: ${result.proteins} g',
+      );
+    } on FirebaseFunctionsException catch (e) {
+      _showSnackBar(e.message ?? 'Fehler beim Senden der Mahlzeit.');
+    } on ArgumentError catch (e) {
+      _showSnackBar(e.message ?? 'Ungültige Eingabe.');
+    } on Exception catch (e) {
+      _showSnackBar('Fehler beim Senden der Mahlzeit: $e');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isSending = false;
+        });
+      }
+    }
+  }
+
+  void _showSnackBar(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -78,6 +134,7 @@ class _NewEntryScreenState extends State<NewEntryScreen> {
 
                 ElevatedButton.icon(
                   icon: Icon(Icons.send),
+                  // TODO 1: Screen verbergen während _isSending läuft und dafür Snackbert Animation rein + circularprogressDingel
                   onPressed: _onSendMeal,
                   label: Text("Eintragen"),
                 ),

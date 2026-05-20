@@ -1,3 +1,4 @@
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,6 +14,10 @@ void main() async {
 
   // 2. Pass the CLI configuration details here
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await FirebaseAppCheck.instance.activate(
+    // TODO PROD: Swap to AndroidPlayIntegrityProvider() for Prod
+    providerAndroid: AndroidDebugProvider(),
+  );
   final authService = AuthService();
 
   runApp(ProviderScope(child: Snackbert(authService: authService)));
