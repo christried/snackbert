@@ -2,7 +2,6 @@
 
 import 'dart:io';
 
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/providers/meal_analysis_provider.dart';
@@ -61,11 +60,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
         'Kohlenhydrate: ${result.carbs} g · '
         'Fette: ${result.fats} g · '
         'Proteine: ${result.proteins} g',
-      );
-    } on FirebaseFunctionsException catch (e) {
-      _showSnackBar(
-        e.message ?? 'Fehler beim Senden der Mahlzeit.',
-        isError: true,
       );
     } on ArgumentError catch (e) {
       _showSnackBar(e.message ?? 'Ungültige Eingabe.', isError: true);

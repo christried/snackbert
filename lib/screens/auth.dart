@@ -115,7 +115,7 @@ class _AuthScreenState extends State<AuthScreen> {
         ElevatedButton.icon(
           onPressed: widget.authService.signIn,
           icon: const Icon(Icons.login_rounded),
-          label: const Text('Login mit Google'),
+          label: const Text('Login'),
         ),
       ],
     );
