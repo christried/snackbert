@@ -26,6 +26,7 @@ void showAppSnackBar(
       content: content,
       backgroundColor: colors.primary,
       padding: const EdgeInsets.all(4),
+      elevation: 80,
     ),
   );
 }

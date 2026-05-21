@@ -1,12 +1,13 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:snackbert/providers/meal_analysis_provider.dart';
-import 'package:snackbert/utils/snackbar.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:snackbert/providers/meal_analysis_provider.dart';
+import 'package:snackbert/providers/meals_provider.dart';
+import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
 import 'package:snackbert/widgets/inputs/meal_recorder.dart';
@@ -51,6 +52,8 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     });
 
     try {
+      // TODO use this to create a new entry in overview
+      // ignore: unused_local_variable
       final result = await ref
           .read(mealAnalysisServiceProvider)
           .analyzeMeal(
@@ -63,10 +66,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
       showAppSnackBar(
         context,
-        'Kalorien: ${result.calories} kcal · '
-        'Kohlenhydrate: ${result.carbs} g · '
-        'Fette: ${result.fats} g · '
-        'Proteine: ${result.proteins} g',
+        "Das muss richtig lecker sein, ich liebe Erdnüsse!",
       );
     } on ArgumentError catch (e) {
       showAppSnackBar(
@@ -86,6 +86,9 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
           _isSending = false;
         });
       }
+
+      // add entry and navigate to overview
+      ref.read(mealsProvider.notifier).addDummyEntry();
     }
   }
 
@@ -167,7 +170,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
                       ElevatedButton.icon(
                         icon: Icon(Icons.send),
-                        // TODO 1: Screen verbergen während _isSending läuft und dafür Snackbert Animation rein + circularprogressDingel
                         onPressed: _onSendMeal,
                         label: Text("Eintragen"),
                         style: ElevatedButton.styleFrom(

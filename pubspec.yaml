@@ -69,6 +69,7 @@ flutter:
   assets:
     - assets/snackbert_mascot_cam.png
     - assets/snackbert_mascot_face_error.png
+    - assets/snackbert_mascot_face_think.png
     - assets/snackbert_mascot_face.png
     - assets/snackbert_mascot_full1.png
     - assets/snackbert_mascot_full2.png

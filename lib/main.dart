@@ -22,6 +22,7 @@ class Snackbert extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromRGBO(128, 178, 114, 1),
         ),
+
         textTheme: GoogleFonts.fredokaTextTheme().copyWith(
           // HEADLINE AUTH SCREEN
           headlineLarge: GoogleFonts.fredoka(
@@ -76,6 +77,7 @@ class Snackbert extends StatelessWidget {
 
         // SNACKBAR
         snackBarTheme: SnackBarThemeData(
+          elevation: 24,
           behavior: SnackBarBehavior.floating,
           backgroundColor: Colors.transparent,
           shape: RoundedRectangleBorder(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:snackbert/providers/meals_provider.dart';
+
 import 'package:snackbert/screens/auth.dart';
 import 'package:snackbert/screens/new_entry.dart';
 import 'package:snackbert/screens/overview.dart';
@@ -42,9 +42,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     var activePageTitle = "Neuer Eintrag";
 
     if (_selectedPageIndex == 1) {
-      final meals = ref.watch(mealsProvider);
-
-      activePage = OverviewScreen(meals: meals);
+      activePage = OverviewScreen();
       activePageTitle = "Deine Übersicht";
     }
 
