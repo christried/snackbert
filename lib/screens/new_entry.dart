@@ -10,6 +10,7 @@ import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
 import 'package:snackbert/widgets/inputs/meal_recorder.dart';
+import 'package:snackbert/widgets/loading_snackbert.dart';
 
 class NewEntryScreen extends ConsumerStatefulWidget {
   const NewEntryScreen({super.key});
@@ -103,53 +104,81 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
       color: colors.primary,
     );
 
+    final oderText = Text("oder", style: TextStyle(color: Colors.black38));
+
     return Scaffold(
       body: Center(
-        child: Padding(
-          padding: EdgeInsetsGeometry.symmetric(vertical: 0, horizontal: 40),
-          child: SingleChildScrollView(
-            child: Column(
-              spacing: 32,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                InfoBracket(
-                  icon: Icon(Icons.info_outline),
-                  text: "Eine Eingabe reicht total aus.",
-                  horMargin: 0,
+        child: _isSending
+            ? LoadingSnackbert()
+            : Padding(
+                padding: EdgeInsetsGeometry.symmetric(
+                  vertical: 0,
+                  horizontal: 25,
                 ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      InfoBracket(
+                        icon: Icon(Icons.info_outline),
+                        text: "Eine Eingabe reicht total aus.",
+                        horMargin: 0,
+                      ),
 
-                MealImagePicker(onPickImage: (image) => _selectedImage = image),
+                      SizedBox(height: 32),
 
-                TextField(
-                  controller: _textInputController,
-                  maxLines: 3,
-                  maxLength: 1000,
-                  style: textFieldTextStyle,
-                  decoration: InputDecoration(
-                    hint: Text(
-                      "z.B. 200g Sojageschnetzeltes, 1 Paprika, 2 EL Öl [...]",
-                    ),
+                      Row(
+                        spacing: 8,
+                        children: [
+                          Expanded(
+                            child: MealImagePicker(
+                              onPickImage: (image) => _selectedImage = image,
+                            ),
+                          ),
+                          oderText,
+                          Expanded(
+                            child: MealRecorder(
+                              onPickAudio: (audioFile) =>
+                                  _recordedAudio = audioFile,
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      SizedBox(height: 16),
+
+                      oderText,
+
+                      SizedBox(height: 16),
+
+                      TextField(
+                        controller: _textInputController,
+                        maxLines: 3,
+                        maxLength: 1000,
+                        style: textFieldTextStyle,
+                        decoration: InputDecoration(
+                          hint: Text(
+                            "z.B. 200g Sojageschnetzeltes, 1 Paprika, 2 EL Öl [...]",
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 16),
+
+                      ElevatedButton.icon(
+                        icon: Icon(Icons.send),
+                        // TODO 1: Screen verbergen während _isSending läuft und dafür Snackbert Animation rein + circularprogressDingel
+                        onPressed: _onSendMeal,
+                        label: Text("Eintragen"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: colors.primary,
+                          foregroundColor: Colors.white,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-
-                MealRecorder(
-                  onPickAudio: (audioFile) => _recordedAudio = audioFile,
-                ),
-
-                ElevatedButton.icon(
-                  icon: Icon(Icons.send),
-                  // TODO 1: Screen verbergen während _isSending läuft und dafür Snackbert Animation rein + circularprogressDingel
-                  onPressed: _onSendMeal,
-                  label: Text("Eintragen"),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colors.primary,
-                    foregroundColor: Colors.white,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
+              ),
       ),
     );
   }

@@ -46,12 +46,12 @@ class _MealImagePickerState extends State<MealImagePicker> {
     Widget content = GestureDetector(
       onTap: _takePicture,
 
-      child: Row(
+      child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset('assets/snackbert_mascot_cam.png', width: 64, height: 64),
+          Image.asset('assets/snackbert_mascot_cam.png', width: 80, height: 80),
 
-          Text("Bild machen", style: bodyLarge),
+          Text("Bild", style: bodyLarge),
         ],
       ),
     );

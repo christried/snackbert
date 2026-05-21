@@ -178,24 +178,21 @@ class _MealRecorderState extends State<MealRecorder> {
       content = TextButton.icon(
         onPressed: _toggleRecording,
         icon: Icon(Icons.stop, size: 40),
-        label: Text(
-          _isRecording ? 'Aufnahme stoppen' : 'Audio aufnehmen',
-          style: bodyLarge,
-        ),
+        label: Text(_isRecording ? 'Stoppen' : 'Starten', style: bodyLarge),
       );
     } else {
       content = GestureDetector(
         onTap: _toggleRecording,
-        child: Row(
+        child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(
               'assets/snackbert_mascot_mic.png',
-              width: 64,
-              height: 64,
+              width: 80,
+              height: 80,
             ),
 
-            Text("Audio aufnehmen", style: bodyLarge),
+            Text("Audio", style: bodyLarge),
           ],
         ),
       );
@@ -203,13 +200,13 @@ class _MealRecorderState extends State<MealRecorder> {
 
     // Once we have a recording, show playback + re-record actions.
     if (_audioPath != null) {
-      content = Row(
+      content = Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           TextButton.icon(
             onPressed: _togglePlayback,
             icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow, size: 40),
-            label: Text(_isPlaying ? 'Pause' : 'Abspielen', style: bodyLarge),
+            label: Text(_isPlaying ? 'Pause' : 'Hören', style: bodyLarge),
           ),
           IconButton(
             onPressed: _discardRecording,
@@ -230,8 +227,7 @@ class _MealRecorderState extends State<MealRecorder> {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      height: 70,
-      width: double.infinity,
+      height: 200,
       alignment: Alignment.center,
       child: Column(mainAxisSize: MainAxisSize.min, children: [content]),
     );
