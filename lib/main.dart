@@ -2,20 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:google_fonts/google_fonts.dart';
-import 'package:snackbert/services/auth_service.dart';
 
 import 'package:snackbert/screens/auth.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final authService = AuthService();
 
-  runApp(ProviderScope(child: Snackbert(authService: authService)));
+  runApp(const ProviderScope(child: Snackbert()));
 }
 
 class Snackbert extends StatelessWidget {
-  const Snackbert({super.key, required this.authService});
-  final AuthService authService;
+  const Snackbert({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -91,7 +88,7 @@ class Snackbert extends StatelessWidget {
           contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
         ),
       ),
-      home: AuthScreen(authService: authService),
+      home: const AuthScreen(),
     );
   }
 }
