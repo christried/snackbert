@@ -22,7 +22,7 @@ class Snackbert extends StatelessWidget {
     return MaterialApp(
       title: 'Snackbert',
       theme: ThemeData(
-        colorScheme: .fromSeed(
+        colorScheme: ColorScheme.fromSeed(
           seedColor: const Color.fromRGBO(128, 178, 114, 1),
         ),
         textTheme: GoogleFonts.fredokaTextTheme().copyWith(

@@ -57,8 +57,6 @@ class _AuthScreenState extends State<AuthScreen> {
       );
       return;
     }
-
-    setState(() {}); //?
   }
 
   @override
@@ -116,6 +114,10 @@ class _AuthScreenState extends State<AuthScreen> {
           onPressed: widget.authService.signIn,
           icon: const Icon(Icons.login_rounded),
           label: const Text('Login'),
+          // style: ElevatedButton.styleFrom(
+          //   backgroundColor: Theme.of(context).colorScheme.primary,
+          //   foregroundColor: Colors.white,
+          // ),
         ),
       ],
     );

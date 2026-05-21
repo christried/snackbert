@@ -21,15 +21,11 @@ class MealAnalysisService {
       );
     }
 
+    // To be used once stuff is uploaded again
+    // ignore: unused_local_variable
     final uploadId = Uuid().v4();
 
-    // TODO: Implement meal analysis when Firebase is set up
     // For now, return stub data
-    return MealAnalysisResult(
-      calories: 0,
-      carbs: 0,
-      fats: 0,
-      proteins: 0,
-    );
+    return MealAnalysisResult(calories: 0, carbs: 0, fats: 0, proteins: 0);
   }
 }

@@ -26,6 +26,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
 
   void _onAuthStateChanged() {
     if (!mounted) return;
+
     if (!widget.authService.isSignedIn) {
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
