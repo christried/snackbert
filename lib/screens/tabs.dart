@@ -4,6 +4,7 @@ import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/screens/auth.dart';
 import 'package:snackbert/screens/new_entry.dart';
 import 'package:snackbert/screens/overview.dart';
+import 'package:snackbert/utils/snackbar.dart';
 
 class TabsScreen extends ConsumerStatefulWidget {
   const TabsScreen({super.key});
@@ -22,6 +23,13 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     setState(() {
       _selectedPageIndex = index;
     });
+  }
+
+  void _onTapLogOut() {
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const AuthScreen()));
+    showAppSnackBar(context, "Bis zum nächsten Mal!");
   }
 
   @override
@@ -47,9 +55,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
         actions: [
           IconButton.filled(
             onPressed: () {
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const AuthScreen()),
-              );
+              _onTapLogOut();
             },
             icon: const Icon(Icons.logout),
           ),

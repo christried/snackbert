@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
 
 import 'package:snackbert/screens/tabs.dart';
+import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});
+
+  void _onTapAuth(BuildContext context) {
+    Navigator.of(
+      context,
+    ).pushReplacement(MaterialPageRoute(builder: (_) => const TabsScreen()));
+    showAppSnackBar(context, "Willkommen zurück!");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,13 +58,13 @@ class AuthScreen extends StatelessWidget {
             const SizedBox(height: 16),
 
             ElevatedButton.icon(
-              onPressed: () {
-                Navigator.of(
-                  context,
-                ).push(MaterialPageRoute(builder: (_) => const TabsScreen()));
-              },
+              onPressed: () => _onTapAuth(context),
               icon: const Icon(Icons.login_rounded),
               label: const Text('Login'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: colors.primary,
+                foregroundColor: Colors.white,
+              ),
             ),
           ],
         ),

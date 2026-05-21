@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/providers/meal_analysis_provider.dart';
+import 'package:snackbert/utils/snackbar.dart';
 
 import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
@@ -33,7 +34,11 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     final hasText = trimmedText.isNotEmpty;
 
     if (!hasText && _selectedImage == null && _recordedAudio == null) {
-      _showSnackBar('Bitte Text, Bild oder Audio angeben.', isError: true);
+      showAppSnackBar(
+        context,
+        'Bitte Text, Bild oder Audio angeben.',
+        isError: true,
+      );
       return;
     }
 
@@ -55,16 +60,25 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
       if (!mounted) return;
 
-      _showSnackBar(
+      showAppSnackBar(
+        context,
         'Kalorien: ${result.calories} kcal · '
         'Kohlenhydrate: ${result.carbs} g · '
         'Fette: ${result.fats} g · '
         'Proteine: ${result.proteins} g',
       );
     } on ArgumentError catch (e) {
-      _showSnackBar(e.message ?? 'Ungültige Eingabe.', isError: true);
+      showAppSnackBar(
+        context,
+        e.message ?? 'Ungültige Eingabe.',
+        isError: true,
+      );
     } on Exception catch (e) {
-      _showSnackBar('Fehler beim Senden der Mahlzeit: $e', isError: true);
+      showAppSnackBar(
+        context,
+        'Fehler beim Senden der Mahlzeit: $e',
+        isError: true,
+      );
     } finally {
       if (mounted) {
         setState(() {
@@ -72,32 +86,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
         });
       }
     }
-  }
-
-  void _showSnackBar(String message, {bool? isError = false}) {
-    if (!mounted) return;
-    final snackBarColor = Theme.of(context).colorScheme.primary;
-    final snackBarTextStyle = Theme.of(context).textTheme.bodyMedium;
-
-    final snackBarContent = ListTile(
-      leading: Image.asset(
-        isError!
-            ? 'assets/snackbert_mascot_face_error.png'
-            : 'assets/snackbert_mascot_face.png',
-        width: 48,
-        height: 48,
-      ),
-      title: Text(message, style: snackBarTextStyle),
-    );
-
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: snackBarContent,
-        backgroundColor: snackBarColor,
-        padding: EdgeInsets.all(4),
-      ),
-    );
   }
 
   @override
@@ -153,6 +141,10 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                   // TODO 1: Screen verbergen während _isSending läuft und dafür Snackbert Animation rein + circularprogressDingel
                   onPressed: _onSendMeal,
                   label: Text("Eintragen"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: colors.primary,
+                    foregroundColor: Colors.white,
+                  ),
                 ),
               ],
             ),
