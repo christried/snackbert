@@ -51,6 +51,8 @@ class OverviewScreen extends ConsumerWidget {
       }
     }
 
+    void onTapMeal() {}
+
     return Column(
       children: [
         OverviewFilters(),
@@ -70,22 +72,25 @@ class OverviewScreen extends ConsumerWidget {
               final protein = currentMeal.macros[Macro.protein];
               final fat = currentMeal.macros[Macro.fat];
 
-              return ListTile(
-                // placeholder image
-                leading: Image.asset('assets/snackbert_mascot_face.png'),
-                title: Text(currentMeal.title),
-                subtitle: Row(
-                  spacing: 8,
-                  children: [
-                    Text("${calories}kcal"),
-                    Text("C: $carbs"),
-                    Text("P: $protein"),
-                    Text("F: $fat"),
-                  ],
-                ),
-                trailing: GestureDetector(
-                  onTap: () => onTapRemove(currentMeal.id),
-                  child: Icon(Icons.remove),
+              return InkWell(
+                onTap: () {},
+                child: ListTile(
+                  // placeholder image
+                  leading: Image.asset('assets/snackbert_mascot_face.png'),
+                  title: Text(currentMeal.title),
+                  subtitle: Row(
+                    spacing: 8,
+                    children: [
+                      Text("${calories}kcal"),
+                      Text("C: $carbs"),
+                      Text("P: $protein"),
+                      Text("F: $fat"),
+                    ],
+                  ),
+                  trailing: GestureDetector(
+                    onTap: () => onTapRemove(currentMeal.id),
+                    child: Icon(Icons.remove),
+                  ),
                 ),
               );
             },
