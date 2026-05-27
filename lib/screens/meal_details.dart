@@ -41,7 +41,7 @@ class MealDetailsScreen extends ConsumerWidget {
     if (!context.mounted || isOk != true) return;
 
     // add entry and navigate to overview
-    ref.read(mealsProvider.notifier).addEntry(meal);
+    ref.read(mealsProvider.notifier).duplicateEntry(meal);
     showAppSnackBar(context, "Mahlzeit duplizierert... oder so!");
     Navigator.of(context).pop();
   }

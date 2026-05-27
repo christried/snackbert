@@ -20,7 +20,7 @@ class Meal {
     required this.macros,
   });
 
-  final String id;
+  String id;
   final String title;
   final String imageUrl;
   final DateTime date;

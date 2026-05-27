@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/models/filters.dart';
 import 'package:snackbert/models/meal.dart';
+import 'package:uuid/uuid.dart';
+
+var uuid = Uuid();
 
 final mealsProvider = NotifierProvider<MealsNotifier, List<Meal>>(
   MealsNotifier.new,
@@ -19,6 +22,18 @@ class MealsNotifier extends Notifier<List<Meal>> {
 
   void addEntry(Meal meal) {
     state = [...state, meal];
+  }
+
+  void duplicateEntry(Meal meal) {
+    final duplicatedMeal = Meal(
+      id: uuid.v4(),
+      title: meal.title,
+      imageUrl: meal.imageUrl,
+      date: meal.date,
+      calories: meal.calories,
+      macros: Map.of(meal.macros),
+    );
+    state = [...state, duplicatedMeal];
   }
 
   void removeEntry(String id) {
@@ -51,11 +66,6 @@ class MealsNotifier extends Notifier<List<Meal>> {
           mealDay.isBefore(startOfNextWeek);
     }).toList();
   }
-
-  //  List<Meal> getNutritionTotals(TimeFilters timeFilter) {
-  //    final today = DateUtils.dateOnly(DateTime.now());
-  //    final nutritionTotals
-  //  }
 }
 
 final dummyMeal = Meal(
