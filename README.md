@@ -1,17 +1,40 @@
 # snackbert
 
-A new Flutter project.
+Snackbert is a playful nutrition tracker that turns meal logging into a fast, low-friction flow.
 
-## Getting Started
+## Screenshots
 
-This project is a starting point for a Flutter application.
+<img src="docs/screenshots/login.png" alt="Login / onboarding" width="260" />
+<img src="docs/screenshots/new-entry.png" alt="New entry" width="260" />
+<img src="docs/screenshots/overview.png" alt="Overview" width="260" />
 
-A few resources to get you started if this is your first Flutter project:
+## What the app does
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+- Log meals by text, photo, or short voice memo.
+- Get a quick AI-driven meal analysis experience with a friendly mascot-led interface.
+- Review your entries in a clean overview with filters, calories, and macro totals.
+- Get reassurance from a helpful mascot rather than stressful alerts about nutrition limitations.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Why
+
+Snackbert is built to feel polished without being heavy. It shows practical Flutter work across UI composition, state management, media input, and a cohesive branded experience.
+
+As a developer, I focus on products that are easy to use, visually memorable, and built around real user behavior instead of generic templates.
+
+## Tech stack
+
+- Flutter
+- Riverpod
+- Firebase services
+- Image and audio input support
+- Custom branded UI (!AI generated assets!) with reusable widgets
+
+## In short
+
+Snackbert is a compact example of the kind of app I like building: friendly, focused, and designed to make a boring task feel effortless.
+
+## Setup
+
+1. Install Flutter and run `flutter doctor`.
+2. Fetch dependencies with `flutter pub get`.
+3. Run the app with `flutter run`.
