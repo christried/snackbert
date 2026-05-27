@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/providers/meals_provider.dart';
+import 'package:snackbert/screens/meal_details.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/inputs/nutrition_totals.dart';
 import 'package:snackbert/widgets/inputs/overview_filters.dart';
@@ -45,13 +46,17 @@ class OverviewScreen extends ConsumerWidget {
         ),
       );
 
-      if (isOk) {
-        ref.read(mealsProvider.notifier).removeEntry(id);
-        showAppSnackBar(context, "Mahlzeit entfernt!");
-      }
+      if (!context.mounted || isOk != true) return;
+
+      ref.read(mealsProvider.notifier).removeEntry(id);
+      showAppSnackBar(context, "Mahlzeit entfernt!");
     }
 
-    void onTapMeal() {}
+    void onTapMeal(Meal meal, BuildContext context) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => MealDetailsScreen(meal: meal)),
+      );
+    }
 
     return Column(
       children: [
@@ -73,10 +78,15 @@ class OverviewScreen extends ConsumerWidget {
               final fat = currentMeal.macros[Macro.fat];
 
               return InkWell(
-                onTap: () {},
+                onTap: () {
+                  onTapMeal(currentMeal, context);
+                },
                 child: ListTile(
                   // placeholder image
-                  leading: Image.asset('assets/snackbert_mascot_face.png'),
+                  leading: Hero(
+                    tag: currentMeal.id,
+                    child: Image.asset('assets/snackbert_mascot_face.png'),
+                  ),
                   title: Text(currentMeal.title),
                   subtitle: Row(
                     spacing: 8,

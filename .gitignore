@@ -1,6 +1,11 @@
-# Miscellaneous
+# funny ai stuff just played around
 *.agents
 skills-lock.json
+ci.yml
+AGENTS.md
+CONTRIBUTING.md
+
+# Miscellaneous
 *.class
 *.log
 *.pyc

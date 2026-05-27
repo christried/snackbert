@@ -16,7 +16,10 @@ void showAppSnackBar(
       width: 48,
       height: 48,
     ),
-    title: Text(message, style: theme.textTheme.bodyMedium),
+    title: Text(
+      message,
+      style: theme.textTheme.bodyMedium!.copyWith(color: Colors.white),
+    ),
   );
 
   final messenger = ScaffoldMessenger.of(context);
