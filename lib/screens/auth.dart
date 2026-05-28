@@ -45,7 +45,7 @@ class _AuthScreenState extends State<AuthScreen> {
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (_) => const TabsScreen()));
-      showAppSnackBar(context, "Omg Hi!");
+      showAppSnackBar(context, "Omg Hi, da bist du ja!");
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
@@ -114,10 +114,8 @@ class _AuthScreenState extends State<AuthScreen> {
 
             const SizedBox(height: 16),
 
-            if (_isAuthenticating)
-              // TODO: Wartender Snackbert bei Login, nicht der Essende
-              LoadingSnackbert()
-            else
+            if (_isAuthenticating) LoadingSnackbert(status: "waiting"),
+            if (!_isAuthenticating)
               ElevatedButton.icon(
                 onPressed: () => _signInWithGoogle(),
                 icon: const Icon(Icons.login_rounded),
