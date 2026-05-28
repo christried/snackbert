@@ -1,17 +1,74 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:snackbert/screens/tabs.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
+import 'package:snackbert/widgets/loading_snackbert.dart';
 
-class AuthScreen extends StatelessWidget {
+class AuthScreen extends StatefulWidget {
   const AuthScreen({super.key});
 
-  void _onTapAuth(BuildContext context) {
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const TabsScreen()));
-    showAppSnackBar(context, "Willkommen zurück!");
+  @override
+  State<AuthScreen> createState() => _AuthScreenState();
+}
+
+class _AuthScreenState extends State<AuthScreen> {
+  bool _isAuthenticating = false;
+
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _isAuthenticating = true;
+    });
+
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance
+          .authenticate();
+
+      if (googleUser == null) {
+        setState(() {
+          _isAuthenticating = false;
+        });
+        return;
+      }
+
+      final GoogleSignInAuthentication googleAuth = googleUser.authentication;
+      final AuthCredential userCredentials = GoogleAuthProvider.credential(
+        idToken: googleAuth.idToken,
+      );
+      await FirebaseAuth.instance.signInWithCredential(userCredentials);
+
+      //  Navigate to the next screen if successful
+      if (!mounted) return;
+
+      Navigator.of(
+        context,
+      ).pushReplacement(MaterialPageRoute(builder: (_) => const TabsScreen()));
+      showAppSnackBar(context, "Omg Hi!");
+    } on FirebaseAuthException catch (e) {
+      if (!mounted) return;
+
+      showAppSnackBar(
+        context,
+        e.message ?? "Anmeldung fehlgeschlagen.",
+        isError: true,
+      );
+      setState(() {
+        _isAuthenticating = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      showAppSnackBar(
+        context,
+        "Ein unerwarteter Fehler ist aufgetreten.",
+        isError: true,
+      );
+      setState(() {
+        _isAuthenticating = false;
+      });
+    }
   }
 
   @override
@@ -57,15 +114,19 @@ class AuthScreen extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            ElevatedButton.icon(
-              onPressed: () => _onTapAuth(context),
-              icon: const Icon(Icons.login_rounded),
-              label: const Text('Login'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colors.primary,
-                foregroundColor: Colors.white,
+            if (_isAuthenticating)
+              // TODO: Wartender Snackbert bei Login, nicht der Essende
+              LoadingSnackbert()
+            else
+              ElevatedButton.icon(
+                onPressed: () => _signInWithGoogle(),
+                icon: const Icon(Icons.login_rounded),
+                label: const Text('Login mit Google'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colors.primary,
+                  foregroundColor: Colors.white,
+                ),
               ),
-            ),
           ],
         ),
       ),
