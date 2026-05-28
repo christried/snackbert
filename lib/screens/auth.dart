@@ -38,6 +38,7 @@ class _AuthScreenState extends State<AuthScreen> {
       Navigator.of(
         context,
       ).pushReplacement(MaterialPageRoute(builder: (_) => const TabsScreen()));
+      // TODO: add different texts per interaction that will be pulled randomly
       showAppSnackBar(context, "Omg Hi, da bist du ja!");
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
@@ -83,12 +84,15 @@ class _AuthScreenState extends State<AuthScreen> {
           children: [
             Text('snackbert', style: headlineStyle),
 
-            Image.asset(
-              'assets/snackbert_mascot.png',
-              width: 160,
-              height: 160,
-              fit: BoxFit.contain,
-            ),
+            if (_isAuthenticating) LoadingSnackbert(status: "waiting"),
+
+            if (!_isAuthenticating)
+              Image.asset(
+                'assets/snackbert_mascot.png',
+                width: 160,
+                height: 160,
+                fit: BoxFit.contain,
+              ),
 
             InfoBracket(
               icon: const Icon(Icons.timer_outlined),
@@ -107,7 +111,6 @@ class _AuthScreenState extends State<AuthScreen> {
 
             const SizedBox(height: 16),
 
-            if (_isAuthenticating) LoadingSnackbert(status: "waiting"),
             if (!_isAuthenticating)
               ElevatedButton.icon(
                 onPressed: () => _signInWithGoogle(),

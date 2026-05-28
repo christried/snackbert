@@ -50,9 +50,9 @@ class _LoadingSnackbertState extends State<LoadingSnackbert> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Image.asset(image, width: 160, height: 160),
-        SizedBox(height: 48),
-        SizedBox(width: 60, height: 60, child: CircularProgressIndicator()),
+        Image.asset(image, width: 176, height: 176),
+        SizedBox(height: 60),
+        SizedBox(width: 80, height: 80, child: CircularProgressIndicator()),
       ],
     );
   }
