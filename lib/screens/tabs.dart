@@ -1,7 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:snackbert/screens/auth.dart';
 import 'package:snackbert/screens/new_entry.dart';
 import 'package:snackbert/screens/overview.dart';
 import 'package:snackbert/utils/snackbar.dart';
@@ -26,10 +26,8 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
   }
 
   void _onTapLogOut() {
-    Navigator.of(
-      context,
-    ).pushReplacement(MaterialPageRoute(builder: (_) => const AuthScreen()));
-    showAppSnackBar(context, "Bis zum nächsten Mal!");
+    FirebaseAuth.instance.signOut();
+    showAppSnackBar(context, "Tschüss :(");
   }
 
   @override

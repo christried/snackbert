@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:snackbert/screens/splash.dart';
 import 'package:snackbert/screens/tabs.dart';
+import 'package:snackbert/utils/snackbar.dart';
 import 'firebase_options.dart';
 
 import 'package:google_fonts/google_fonts.dart';
@@ -106,6 +108,10 @@ class Snackbert extends StatelessWidget {
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return SplashScreen();
+          }
+
           if (snapshot.hasData) {
             return const TabsScreen();
           }

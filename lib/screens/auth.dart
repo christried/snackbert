@@ -32,12 +32,8 @@ class _AuthScreenState extends State<AuthScreen> {
       );
       await FirebaseAuth.instance.signInWithCredential(userCredentials);
 
-      //  Navigate to the next screen if successful
       if (!mounted) return;
 
-      Navigator.of(
-        context,
-      ).pushReplacement(MaterialPageRoute(builder: (_) => const TabsScreen()));
       // TODO: add different texts per interaction that will be pulled randomly
       showAppSnackBar(context, "Omg Hi, da bist du ja!");
     } on FirebaseAuthException catch (e) {
