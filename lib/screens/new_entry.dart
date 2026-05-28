@@ -2,8 +2,10 @@
 
 import 'dart:io';
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -64,18 +66,36 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
             audio: _recordedAudio,
           );
 
-      //add image to firebase
-      if (_selectedImage != null) {
-        final storageRef = FirebaseStorage.instance
-            .ref()
-            .child('meal_images')
-            .child("${Random().nextDouble() * 1000}.jpg");
+      // add image to firebase
+      final storageRef = FirebaseStorage.instance
+          .ref()
+          .child('meal_images')
+          .child("${Random().nextDouble() * 1000}.png");
 
+      if (_selectedImage == null) {
+        final byteData = await rootBundle.load(
+          'assets/snackbert_mascot_face.png',
+        );
+        final imageBytes = byteData.buffer.asUint8List();
+
+        await storageRef.putData(imageBytes);
+      } else {
         await storageRef.putFile(_selectedImage!);
-        final imageUrl = await storageRef.getDownloadURL();
-
-        print(imageUrl);
       }
+
+      final imageUrl = await storageRef.getDownloadURL();
+
+      print(imageUrl);
+
+      // add meal to database
+      await FirebaseFirestore.instance
+          .collection("meals")
+          .doc("${Random().nextDouble() * 1000}")
+          .set({
+            "user": "Chris",
+            "imageUrl": imageUrl,
+            "textInput": _textInputController.text,
+          });
 
       if (!mounted) return;
 
@@ -105,6 +125,10 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
       // add entry and navigate to overview
       ref.read(mealsProvider.notifier).addDummyEntry();
+
+      _selectedImage = null;
+      _recordedAudio = null;
+      _textInputController.clear();
     }
   }
 
