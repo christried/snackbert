@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_print
 
 import 'dart:io';
+import 'dart:math';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -62,10 +64,24 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
             audio: _recordedAudio,
           );
 
+      //add image to firebase
+      if (_selectedImage != null) {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('meal_images')
+            .child("${Random().nextDouble() * 1000}.jpg");
+
+        await storageRef.putFile(_selectedImage!);
+        final imageUrl = await storageRef.getDownloadURL();
+
+        print(imageUrl);
+      }
+
       if (!mounted) return;
 
       showAppSnackBar(
         context,
+        // TODO Motivational Quote + Meal Title will also be received by the LLM
         "Das muss richtig lecker sein, ich liebe Erdnüsse!",
       );
     } on ArgumentError catch (e) {

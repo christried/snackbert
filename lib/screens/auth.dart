@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import 'package:snackbert/screens/tabs.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/loading_snackbert.dart';
