@@ -23,15 +23,8 @@ class _AuthScreenState extends State<AuthScreen> {
     });
 
     try {
-      final GoogleSignInAccount? googleUser = await GoogleSignIn.instance
+      final GoogleSignInAccount googleUser = await GoogleSignIn.instance
           .authenticate();
-
-      if (googleUser == null) {
-        setState(() {
-          _isAuthenticating = false;
-        });
-        return;
-      }
 
       final GoogleSignInAuthentication googleAuth = googleUser.authentication;
       final AuthCredential userCredentials = GoogleAuthProvider.credential(
