@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:snackbert/models/meal_analysis.dart';
 import 'package:uuid/uuid.dart';
-
-import 'package:snackbert/models/meal.dart';
 
 class MealAnalysisService {
   MealAnalysisService();
@@ -28,9 +27,16 @@ class MealAnalysisService {
 
     // 4 seconds delay simulating the openAI API Call
 
-    await Future.delayed(const Duration(seconds: 4));
+    await Future.delayed(const Duration(seconds: 2));
 
     // For now, return stub data
-    return MealAnalysisResult(calories: 0, carbs: 0, fats: 0, proteins: 0);
+    return MealAnalysisResult(
+      title: "added Test Mahlzeit",
+      appreciationMessage: "LECKER!!!",
+      calories: 0,
+      carbs: 0,
+      fats: 0,
+      proteins: 0,
+    );
   }
 }

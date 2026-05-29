@@ -3,11 +3,14 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/models/meal.dart';
+import 'package:snackbert/models/meal_analysis.dart';
 
 import 'package:snackbert/providers/meal_analysis_provider.dart';
 import 'package:snackbert/providers/meals_provider.dart';
@@ -16,6 +19,9 @@ import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
 import 'package:snackbert/widgets/inputs/meal_recorder.dart';
 import 'package:snackbert/widgets/loading_snackbert.dart';
+import 'package:uuid/uuid.dart';
+
+var uuid = Uuid();
 
 class NewEntryScreen extends ConsumerStatefulWidget {
   const NewEntryScreen({super.key});
@@ -57,8 +63,8 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
     try {
       // TODO use this to create a new entry in overview
-      // ignore: unused_local_variable
-      final result = await ref
+
+      final MealAnalysisResult mealAnalysisResult = await ref
           .read(mealAnalysisServiceProvider)
           .analyzeMeal(
             text: hasText ? trimmedText : null,
@@ -85,17 +91,46 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
       final imageUrl = await storageRef.getDownloadURL();
 
-      print(imageUrl);
+      // add audio to firebase in case it exists - otherwise dont.
+      String audioUrl;
+      if (_recordedAudio == null) {
+        audioUrl = "";
+      } else {
+        // upload and set audioUrl
+        final audioStorageRef = FirebaseStorage.instance
+            .ref()
+            .child('meal_audios')
+            .child("${Random().nextDouble() * 1000}.m4a");
+
+        await audioStorageRef.putFile(_recordedAudio!);
+
+        audioUrl = await audioStorageRef.getDownloadURL();
+      }
+
+      final Meal meal = Meal(
+        id: uuid.v4(),
+        userId: FirebaseAuth.instance.currentUser!.uid,
+        date: DateTime.now(),
+        title: mealAnalysisResult.title,
+        appreciationMessage: mealAnalysisResult.appreciationMessage,
+        calories: mealAnalysisResult.calories,
+        macros: {
+          Macro.carb: mealAnalysisResult.carbs,
+          Macro.protein: mealAnalysisResult.proteins,
+          Macro.fat: mealAnalysisResult.fats,
+        },
+        imageUrl: imageUrl,
+        audioUrl: audioUrl,
+        inputText: _textInputController.text,
+      );
+
+      final mealPayload = meal.toMap();
 
       // add meal to database
       await FirebaseFirestore.instance
           .collection("meals")
           .doc("${Random().nextDouble() * 1000}")
-          .set({
-            "user": "Chris",
-            "imageUrl": imageUrl,
-            "textInput": _textInputController.text,
-          });
+          .set(mealPayload);
 
       if (!mounted) return;
 

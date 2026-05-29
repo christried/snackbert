@@ -27,6 +27,10 @@ class MealsNotifier extends Notifier<List<Meal>> {
   void duplicateEntry(Meal meal) {
     final duplicatedMeal = Meal(
       id: uuid.v4(),
+      appreciationMessage: "appreciationMessage",
+      audioUrl: "",
+      inputText: "input text",
+      userId: "asdasdqwewqewqe",
       title: meal.title,
       imageUrl: meal.imageUrl,
       date: meal.date,
@@ -70,6 +74,10 @@ class MealsNotifier extends Notifier<List<Meal>> {
 
 final dummyMeal = Meal(
   id: "4",
+  appreciationMessage: "appreciationMessage",
+  audioUrl: "",
+  inputText: "input text",
+  userId: "asdasdqwewqewqe",
   title: "Beispiel Mahlzeit ADDED",
   imageUrl: "",
   //always today
@@ -81,6 +89,10 @@ final dummyMeal = Meal(
 final dummyMeals = [
   Meal(
     id: "1",
+    appreciationMessage: "appreciationMessage",
+    audioUrl: "",
+    inputText: "input text",
+    userId: "asdasdqwewqewqe",
     title: "Beispiel Mahlzeit Heute",
     imageUrl: "",
     //always today
@@ -90,6 +102,10 @@ final dummyMeals = [
   ),
   Meal(
     id: "2",
+    appreciationMessage: "appreciationMessage",
+    audioUrl: "",
+    inputText: "input text",
+    userId: "asdasdqwewqewqe",
     title: "Beispiel Mahlzeit Gestern",
     imageUrl: "",
     // always a day ago
@@ -99,6 +115,10 @@ final dummyMeals = [
   ),
   Meal(
     id: "3",
+    appreciationMessage: "appreciationMessage",
+    audioUrl: "",
+    inputText: "input text",
+    userId: "asdasdqwewqewqe",
     title: "Beispiel Mahlzeit 8Tage",
     imageUrl: "",
     // always a day ago
