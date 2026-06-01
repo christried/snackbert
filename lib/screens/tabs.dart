@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/providers/meal_submitting_provider.dart';
 
 import 'package:snackbert/screens/new_entry.dart';
 import 'package:snackbert/screens/overview.dart';
@@ -36,6 +37,8 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
+    final isSubmitting = ref.watch(mealSubmittingProvider);
+
     Widget activePage = const NewEntryScreen();
     var activePageTitle = "Neuer Eintrag";
 
@@ -44,33 +47,40 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
       activePageTitle = "Deine Übersicht";
     }
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(activePageTitle),
-        backgroundColor: colors.secondaryContainer,
-        actions: [
-          IconButton.filled(
-            onPressed: () {
-              _onTapLogOut();
-            },
-            icon: const Icon(Icons.logout),
+    return PopScope(
+      canPop: !isSubmitting,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(activePageTitle),
+          backgroundColor: colors.secondaryContainer,
+          actions: [
+            IconButton.filled(
+              onPressed: isSubmitting ? null : _onTapLogOut,
+              icon: const Icon(Icons.logout),
+            ),
+          ],
+        ),
+        body: activePage,
+        bottomNavigationBar: IgnorePointer(
+          ignoring: isSubmitting,
+          child: BottomNavigationBar(
+            currentIndex: _selectedPageIndex,
+            onTap: _selectPage,
+            selectedFontSize: 16,
+            selectedItemColor: const Color.fromARGB(183, 0, 0, 0),
+            backgroundColor: colors.secondaryContainer,
+            items: [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.add),
+                label: "Eintragen",
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.menu_book_rounded),
+                label: "Übersicht",
+              ),
+            ],
           ),
-        ],
-      ),
-      body: activePage,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedPageIndex,
-        onTap: _selectPage,
-        selectedFontSize: 16,
-        selectedItemColor: const Color.fromARGB(183, 0, 0, 0),
-        backgroundColor: colors.secondaryContainer,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.add), label: "Eintragen"),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.menu_book_rounded),
-            label: "Übersicht",
-          ),
-        ],
+        ),
       ),
     );
   }

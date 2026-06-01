@@ -13,6 +13,7 @@ import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/models/meal_analysis.dart';
 
 import 'package:snackbert/providers/meal_analysis_provider.dart';
+import 'package:snackbert/providers/meal_submitting_provider.dart';
 import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
@@ -37,10 +38,9 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
   File? _recordedAudio;
   final _textInputController = TextEditingController();
 
-  bool _isSending = false;
-
   Future<void> _onSendMeal() async {
-    if (_isSending) return;
+    if (ref.read(mealSubmittingProvider)) return;
+    ref.read(mealSubmittingProvider.notifier).toggleSubmission();
 
     final trimmedText = _textInputController.text.trim();
     final hasText = trimmedText.isNotEmpty;
@@ -56,10 +56,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
     // to get rid of keyboard
     FocusScope.of(context).unfocus();
-
-    setState(() {
-      _isSending = true;
-    });
 
     try {
       // TODO use this to create a new entry in overview
@@ -129,8 +125,10 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
       // add meal to database
       await FirebaseFirestore.instance
           .collection("meals")
-          .doc("${Random().nextDouble() * 1000}")
+          .doc(mealPayload["id"])
           .set(mealPayload);
+
+      ref.read(mealsProvider.notifier).addEntry(meal);
 
       if (!mounted) return;
 
@@ -153,13 +151,8 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
       );
     } finally {
       if (mounted) {
-        setState(() {
-          _isSending = false;
-        });
+        ref.read(mealSubmittingProvider.notifier).toggleSubmission();
       }
-
-      // add entry and navigate to overview
-      ref.read(mealsProvider.notifier).addDummyEntry();
 
       _selectedImage = null;
       _recordedAudio = null;
@@ -184,10 +177,12 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
     final oderText = Text("oder", style: TextStyle(color: Colors.black38));
 
+    final isSubmitting = ref.watch(mealSubmittingProvider);
+
     return Scaffold(
       body: Center(
-        child: _isSending
-            ? LoadingSnackbert()
+        child: isSubmitting
+            ? const LoadingSnackbert()
             : Padding(
                 padding: EdgeInsetsGeometry.symmetric(
                   vertical: 0,
