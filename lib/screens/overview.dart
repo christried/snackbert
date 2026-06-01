@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/screens/meal_details.dart';
@@ -24,7 +25,7 @@ class OverviewScreen extends ConsumerWidget {
         builder: (context) => AlertDialog(
           title: Text("Wirklich löschen?"),
           content: Text(
-            "Snackbert kann sich danach nicht mehr an diese Mahlzeit erinnern.",
+            "Ich werd' mich danach nicht mehr an diese Mahlzeit erinnern können.",
           ),
           elevation: 80,
           icon: Image.asset(
@@ -49,7 +50,7 @@ class OverviewScreen extends ConsumerWidget {
       if (!context.mounted || isOk != true) return;
 
       ref.read(mealsProvider.notifier).removeEntry(id);
-      showAppSnackBar(context, "Mahlzeit entfernt!");
+      showAppSnackBar(context, SnackbertMessages.randomDeleteMealMessage);
     }
 
     void onTapMeal(Meal meal, BuildContext context) {

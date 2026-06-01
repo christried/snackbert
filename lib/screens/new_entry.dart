@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/models/meal_analysis.dart';
 
@@ -48,9 +49,10 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     if (!hasText && _selectedImage == null && _recordedAudio == null) {
       showAppSnackBar(
         context,
-        'Bitte Text, Bild oder Audio angeben.',
+        SnackbertMessages.randomMissingInputMessage,
         isError: true,
       );
+      ref.read(mealSubmittingProvider.notifier).toggleSubmission();
       return;
     }
 
@@ -140,13 +142,13 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     } on ArgumentError catch (e) {
       showAppSnackBar(
         context,
-        e.message ?? 'Ungültige Eingabe.',
+        e.message ?? SnackbertMessages.randomErrorFallback,
         isError: true,
       );
-    } on Exception catch (e) {
+    } on Exception catch (_) {
       showAppSnackBar(
         context,
-        'Fehler beim Senden der Mahlzeit: $e',
+        SnackbertMessages.randomErrorFallback,
         isError: true,
       );
     } finally {

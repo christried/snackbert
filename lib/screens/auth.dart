@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:snackbert/data/snackbert_messages.dart';
 
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
@@ -33,14 +34,13 @@ class _AuthScreenState extends State<AuthScreen> {
 
       if (!mounted) return;
 
-      // TODO: add different texts per interaction that will be pulled randomly
-      showAppSnackBar(context, "Omg Hi, da bist du ja!");
+      showAppSnackBar(context, SnackbertMessages.randomGreeting);
     } on FirebaseAuthException catch (e) {
       if (!mounted) return;
 
       showAppSnackBar(
         context,
-        e.message ?? "Anmeldung fehlgeschlagen.",
+        e.message ?? SnackbertMessages.randomErrorFallback,
         isError: true,
       );
       setState(() {
@@ -51,7 +51,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
       showAppSnackBar(
         context,
-        "Ein unerwarteter Fehler ist aufgetreten.",
+        SnackbertMessages.randomErrorFallback,
         isError: true,
       );
       setState(() {

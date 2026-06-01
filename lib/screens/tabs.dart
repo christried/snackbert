@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/providers/meal_submitting_provider.dart';
 
 import 'package:snackbert/screens/new_entry.dart';
@@ -28,7 +29,7 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
 
   void _onTapLogOut() {
     FirebaseAuth.instance.signOut();
-    showAppSnackBar(context, "Tschüss :(");
+    showAppSnackBar(context, SnackbertMessages.randomLogoutMessage);
   }
 
   @override

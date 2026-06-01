@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/utils/snackbar.dart';
@@ -16,7 +17,7 @@ class MealDetailsScreen extends ConsumerWidget {
       builder: (context) => AlertDialog(
         title: Text("Wirklich nochmal essen?"),
         content: Text(
-          "Wenn du bestätigst, füge ich exakt diese Mahlzeit nochmal deiner Übersicht hinzu. Du kannst diese natürlich jederzeit wieder entfernen.",
+          "Wenn du bestätigst, füge ich diese Leckerheit nochmal deiner Übersicht hinzu. Du kannst den Eintrag natürlich jederzeit wieder entfernen. Also von mir entfernen lassen, meine ich.",
         ),
         elevation: 80,
         icon: Image.asset(
@@ -42,7 +43,7 @@ class MealDetailsScreen extends ConsumerWidget {
 
     // add entry and navigate to overview
     ref.read(mealsProvider.notifier).duplicateEntry(meal);
-    showAppSnackBar(context, "Mahlzeit duplizierert... oder so!");
+    showAppSnackBar(context, SnackbertMessages.randomDuplicateMealMessage);
     Navigator.of(context).pop();
   }
 
