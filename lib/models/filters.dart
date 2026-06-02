@@ -1,1 +1,1 @@
-enum TimeFilters { today, thisWeek, allTime }
+enum TimeFilters { today, lastSevenDays, allTime }

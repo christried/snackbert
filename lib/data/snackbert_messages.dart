@@ -81,6 +81,19 @@ class SnackbertMessages {
     "Bis zum nächsten Mal! Vergiss nicht, genug zu trinken. Wir sehen uns später!",
   ];
 
+  static final List<String> _emptyListMessages = [
+    "Hier ist ja noch gähnende Leere! Wenn du magst, tipp mir einfach deinen ersten Eintrag ein. 🐿️",
+    "Noch kein einziger Krümel in der Übersicht! Sollen wir zusammen den ersten Eintrag wagen?",
+    "Ich habe extra meine Lupe herausgeholt, aber hier steht noch gar nichts. Du kannst jederzeit was hinzufügen!",
+    "Hier ist es gerade noch leerer als mein geheimes Nussversteck im Frühling. Lass uns das ändern!",
+    "Ganz schön ruhig hier... Mein innerer Taschenrechner langweilt sich schon ein bisschen. Schreibst du mir was? ✍️",
+    "Hier ist noch alles blitzblank geputzt! Sobald du bereit bist, kannst du ganz einfach eine Mahlzeit eintragen.",
+    "Upsi, hier ist ja noch absolute Funkstille im System! Ich sitze bereit und warte auf deinen ersten Eintrag.",
+    "Hier schaut mich nur die weiße Seite an. Ich halte den Stift schon in den Pfoten, du musst mir nur sagen, was wir aufschreiben! 🥜",
+    "Suchst du auch gerade nach Einträgen? Ich finde hier nämlich noch absolut gar nichts. Wollen wir was hinzufügen?",
+    "Alles leer! Keine Sorge, ich passe auf den Platz auf, bis du die Übersicht mit Leben füllst. ✨",
+  ];
+
   static String get randomGreeting =>
       _greetings[Random().nextInt(_greetings.length)];
 
@@ -98,4 +111,7 @@ class SnackbertMessages {
 
   static String get randomLogoutMessage =>
       _logoutMessages[Random().nextInt(_logoutMessages.length)];
+
+  static String get randomEmptyListMessage =>
+      _emptyListMessages[Random().nextInt(_emptyListMessages.length)];
 }

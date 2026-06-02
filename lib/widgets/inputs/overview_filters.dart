@@ -17,8 +17,8 @@ class _OverviewFiltersState extends ConsumerState<OverviewFilters> {
     switch (filter) {
       case TimeFilters.today:
         return "Heute";
-      case TimeFilters.thisWeek:
-        return "Diese Woche";
+      case TimeFilters.lastSevenDays:
+        return "Letzte 7 Tage";
       case TimeFilters.allTime:
         return "Alles";
     }

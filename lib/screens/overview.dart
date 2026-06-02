@@ -5,7 +5,7 @@ import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/screens/meal_details.dart';
 import 'package:snackbert/utils/snackbar.dart';
-import 'package:snackbert/widgets/info_bracket.dart';
+import 'package:snackbert/widgets/empty_list_placeholder.dart';
 import 'package:snackbert/widgets/inputs/nutrition_totals.dart';
 import 'package:snackbert/widgets/inputs/overview_filters.dart';
 import 'package:snackbert/widgets/loading_snackbert.dart';
@@ -63,17 +63,12 @@ class OverviewScreen extends ConsumerWidget {
       stream: ref.read(mealsProvider.notifier).mealsStream,
       builder: (context, mealSnapshots) {
         if (mealSnapshots.connectionState == ConnectionState.waiting) {
-          return LoadingSnackbert(status: 'waiting');
+          return Center(child: LoadingSnackbert(status: 'waiting'));
         }
 
-        if (!mealSnapshots.hasData || mealSnapshots.data!.docs.isEmpty) {
-          return const Center(
-            child: InfoBracket(
-              icon: Icon(Icons.warning_outlined),
-              text: "Bisher fehlen hier Einträge. Mach doch deinen Ersten!",
-            ),
-          );
-        }
+        // if (!mealSnapshots.hasData || mealSnapshots.data!.docs.isEmpty) {
+        //   return const Center(child: EmptyListPlaceholder());
+        // }
 
         if (mealSnapshots.hasError) {
           showAppSnackBar(
@@ -98,50 +93,55 @@ class OverviewScreen extends ConsumerWidget {
         return Column(
           children: [
             OverviewFilters(),
-            Expanded(
-              child: ListView.separated(
-                separatorBuilder: (context, index) => Divider(
-                  height: 1,
-                  color: colors.tertiary,
-                  indent: 16,
-                  endIndent: 16,
-                ),
-                itemCount: filteredMeals.length,
-                itemBuilder: (context, index) {
-                  final currentMeal = filteredMeals[index];
-                  final calories = currentMeal.calories.toString();
-                  final carbs = currentMeal.macros[Macro.carb];
-                  final protein = currentMeal.macros[Macro.protein];
-                  final fat = currentMeal.macros[Macro.fat];
 
-                  return InkWell(
-                    onTap: () {
-                      onTapMeal(currentMeal, context);
-                    },
-                    child: ListTile(
-                      // placeholder image
-                      leading: Hero(
-                        tag: currentMeal.id,
-                        child: Image.asset('assets/snackbert_mascot_face.png'),
+            Expanded(
+              child: filteredMeals.isEmpty
+                  ? Center(child: EmptyListPlaceholder())
+                  : ListView.separated(
+                      separatorBuilder: (context, index) => Divider(
+                        height: 1,
+                        color: colors.tertiary,
+                        indent: 16,
+                        endIndent: 16,
                       ),
-                      title: Text(currentMeal.title),
-                      subtitle: Row(
-                        spacing: 8,
-                        children: [
-                          Text("${calories}kcal"),
-                          Text("C: $carbs"),
-                          Text("P: $protein"),
-                          Text("F: $fat"),
-                        ],
-                      ),
-                      trailing: GestureDetector(
-                        onTap: () => onTapRemove(currentMeal.id),
-                        child: Icon(Icons.remove),
-                      ),
+                      itemCount: filteredMeals.length,
+                      itemBuilder: (context, index) {
+                        final currentMeal = filteredMeals[index];
+                        final calories = currentMeal.calories.toString();
+                        final carbs = currentMeal.macros[Macro.carb];
+                        final protein = currentMeal.macros[Macro.protein];
+                        final fat = currentMeal.macros[Macro.fat];
+
+                        return InkWell(
+                          onTap: () {
+                            onTapMeal(currentMeal, context);
+                          },
+                          child: ListTile(
+                            // placeholder image
+                            leading: Hero(
+                              tag: currentMeal.id,
+                              child: Image.asset(
+                                'assets/snackbert_mascot_face.png',
+                              ),
+                            ),
+                            title: Text(currentMeal.title),
+                            subtitle: Row(
+                              spacing: 8,
+                              children: [
+                                Text("${calories}kcal"),
+                                Text("C: $carbs"),
+                                Text("P: $protein"),
+                                Text("F: $fat"),
+                              ],
+                            ),
+                            trailing: GestureDetector(
+                              onTap: () => onTapRemove(currentMeal.id),
+                              child: Icon(Icons.remove),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
             NutritionTotals(),
           ],

@@ -66,15 +66,13 @@ class MealsNotifier extends Notifier<List<Meal>> {
         .toList();
   }
 
-  List<Meal> mealsForThisWeek() {
+  List<Meal> mealsForLastSevenDays() {
     final now = DateUtils.dateOnly(DateTime.now());
-    final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
-    final startOfNextWeek = startOfWeek.add(const Duration(days: 7));
+    final sevenDaysAgo = now.subtract(const Duration(days: 7));
 
     return _allMeals.where((meal) {
       final mealDay = DateUtils.dateOnly(meal.date);
-      return !mealDay.isBefore(startOfWeek) &&
-          mealDay.isBefore(startOfNextWeek);
+      return !mealDay.isBefore(sevenDaysAgo) && !mealDay.isAfter(now);
     }).toList();
   }
 
@@ -82,8 +80,8 @@ class MealsNotifier extends Notifier<List<Meal>> {
     if (filter == TimeFilters.today) {
       return mealsForToday();
     }
-    if (filter == TimeFilters.thisWeek) {
-      return mealsForThisWeek();
+    if (filter == TimeFilters.lastSevenDays) {
+      return mealsForLastSevenDays();
     }
     return meals;
   }
