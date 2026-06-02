@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/data/snackbert_messages.dart';
@@ -16,8 +17,6 @@ class OverviewScreen extends ConsumerWidget {
     // STYLING
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-
-    final List<Meal> meals = ref.watch(mealsProvider);
 
     void onTapRemove(String id) async {
       final isOk = await showDialog(
@@ -59,56 +58,80 @@ class OverviewScreen extends ConsumerWidget {
       );
     }
 
-    return Column(
-      children: [
-        OverviewFilters(),
-        Expanded(
-          child: ListView.separated(
-            separatorBuilder: (context, index) => Divider(
-              height: 1,
-              color: colors.tertiary,
-              indent: 16,
-              endIndent: 16,
-            ),
-            itemCount: meals.length,
-            itemBuilder: (context, index) {
-              final currentMeal = meals[index];
-              final calories = currentMeal.calories.toString();
-              final carbs = currentMeal.macros[Macro.carb];
-              final protein = currentMeal.macros[Macro.protein];
-              final fat = currentMeal.macros[Macro.fat];
+    return StreamBuilder(
+      stream: FirebaseFirestore.instance
+          .collection("meals")
+          .orderBy("date", descending: false)
+          .snapshots(),
+      builder: (context, mealSnapshots) {
+        if (mealSnapshots.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-              return InkWell(
-                onTap: () {
-                  onTapMeal(currentMeal, context);
-                },
-                child: ListTile(
-                  // placeholder image
-                  leading: Hero(
-                    tag: currentMeal.id,
-                    child: Image.asset('assets/snackbert_mascot_face.png'),
-                  ),
-                  title: Text(currentMeal.title),
-                  subtitle: Row(
-                    spacing: 8,
-                    children: [
-                      Text("${calories}kcal"),
-                      Text("C: $carbs"),
-                      Text("P: $protein"),
-                      Text("F: $fat"),
-                    ],
-                  ),
-                  trailing: GestureDetector(
-                    onTap: () => onTapRemove(currentMeal.id),
-                    child: Icon(Icons.remove),
-                  ),
+        if (!mealSnapshots.hasData || mealSnapshots.data!.docs.isEmpty) {
+          return const Center(child: Text("keine meals"));
+        }
+
+        if (mealSnapshots.hasError) {
+          return const Center(child: Text("Error lol"));
+        }
+
+        final loadedMeals = mealSnapshots.data!.docs
+            .map((doc) => Meal.fromMap({...doc.data()}))
+            .toList();
+
+        return Column(
+          children: [
+            OverviewFilters(),
+            Expanded(
+              child: ListView.separated(
+                separatorBuilder: (context, index) => Divider(
+                  height: 1,
+                  color: colors.tertiary,
+                  indent: 16,
+                  endIndent: 16,
                 ),
-              );
-            },
-          ),
-        ),
-        NutritionTotals(),
-      ],
+                itemCount: loadedMeals.length,
+                itemBuilder: (context, index) {
+                  final currentMeal = loadedMeals[index];
+                  final calories = currentMeal.calories.toString();
+                  final carbs = currentMeal.macros[Macro.carb];
+                  final protein = currentMeal.macros[Macro.protein];
+                  final fat = currentMeal.macros[Macro.fat];
+
+                  return InkWell(
+                    onTap: () {
+                      onTapMeal(currentMeal, context);
+                    },
+                    child: ListTile(
+                      // placeholder image
+                      leading: Hero(
+                        tag: currentMeal.id,
+                        child: Image.asset('assets/snackbert_mascot_face.png'),
+                      ),
+                      title: Text(currentMeal.title),
+                      subtitle: Row(
+                        spacing: 8,
+                        children: [
+                          Text("${calories}kcal"),
+                          Text("C: $carbs"),
+                          Text("P: $protein"),
+                          Text("F: $fat"),
+                        ],
+                      ),
+                      trailing: GestureDetector(
+                        onTap: () => onTapRemove(currentMeal.id),
+                        child: Icon(Icons.remove),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            NutritionTotals(),
+          ],
+        );
+      },
     );
   }
 }

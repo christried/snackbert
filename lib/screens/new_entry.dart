@@ -231,6 +231,9 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                         maxLines: 3,
                         maxLength: 1000,
                         style: textFieldTextStyle,
+                        textCapitalization: TextCapitalization.sentences,
+                        autocorrect: true,
+                        enableSuggestions: true,
                         decoration: InputDecoration(
                           hint: Text(
                             "z.B. 200g Sojageschnetzeltes, 1 Paprika, 2 EL Öl [...]",

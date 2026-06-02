@@ -49,7 +49,12 @@ class _LoadingSnackbertState extends State<LoadingSnackbert> {
 
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [Image.asset(image, width: 256, height: 256)],
+      children: [
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          child: Image.asset(image, width: 256, height: 256),
+        ),
+      ],
     );
   }
 }

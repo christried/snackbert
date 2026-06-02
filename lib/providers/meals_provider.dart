@@ -16,10 +16,6 @@ class MealsNotifier extends Notifier<List<Meal>> {
     return dummyMeals;
   }
 
-  void addDummyEntry() {
-    state = [...state, dummyMeal];
-  }
-
   void addEntry(Meal meal) {
     state = [...state, meal];
   }
@@ -71,20 +67,6 @@ class MealsNotifier extends Notifier<List<Meal>> {
     }).toList();
   }
 }
-
-final dummyMeal = Meal(
-  id: "4",
-  appreciationMessage: "appreciationMessage",
-  audioUrl: "",
-  inputText: "input text",
-  userId: "asdasdqwewqewqe",
-  title: "Beispiel Mahlzeit ADDED",
-  imageUrl: "",
-  //always today
-  date: DateTime.now(),
-  calories: 555,
-  macros: {Macro.carb: 20, Macro.protein: 30, Macro.fat: 20},
-);
 
 final dummyMeals = [
   Meal(
