@@ -15,7 +15,6 @@ import 'package:snackbert/models/meal_analysis.dart';
 
 import 'package:snackbert/providers/meal_analysis_provider.dart';
 import 'package:snackbert/providers/meal_submitting_provider.dart';
-import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
@@ -60,8 +59,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     FocusScope.of(context).unfocus();
 
     try {
-      // TODO use this to create a new entry in overview
-
       final MealAnalysisResult mealAnalysisResult = await ref
           .read(mealAnalysisServiceProvider)
           .analyzeMeal(
@@ -129,8 +126,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
           .collection("meals")
           .doc(mealPayload["id"])
           .set(mealPayload);
-
-      ref.read(mealsProvider.notifier).addEntry(meal);
 
       if (!mounted) return;
 

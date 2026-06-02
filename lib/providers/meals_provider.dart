@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/models/filters.dart';
@@ -13,31 +14,35 @@ final mealsProvider = NotifierProvider<MealsNotifier, List<Meal>>(
 class MealsNotifier extends Notifier<List<Meal>> {
   @override
   List<Meal> build() {
-    return dummyMeals;
+    return [];
   }
 
-  void addEntry(Meal meal) {
-    state = [...state, meal];
-  }
+  final mealsStream = FirebaseFirestore.instance
+      .collection("meals")
+      .orderBy("date", descending: false)
+      .snapshots();
 
-  void duplicateEntry(Meal meal) {
-    final duplicatedMeal = Meal(
+  void duplicateEntry(Meal meal) async {
+    final duplicatedMeal = meal.copyWith(
       id: uuid.v4(),
-      appreciationMessage: "appreciationMessage",
-      audioUrl: "",
-      inputText: "input text",
-      userId: "asdasdqwewqewqe",
-      title: meal.title,
-      imageUrl: meal.imageUrl,
-      date: meal.date,
-      calories: meal.calories,
-      macros: Map.of(meal.macros),
+      date: DateTime.now(),
+      macros: Map.of(
+        meal.macros,
+      ), // necessary "deep" copy so mutations are not shared. But maybe that would be nice too since its the same meal?
     );
-    state = [...state, duplicatedMeal];
+
+    final mealPayload = duplicatedMeal.toMap();
+
+    // add meal to database
+    await FirebaseFirestore.instance
+        .collection("meals")
+        .doc(mealPayload["id"])
+        .set(mealPayload);
   }
 
   void removeEntry(String id) {
     state = state.where((meal) => meal.id != id).toList();
+    FirebaseFirestore.instance.collection("meals").doc(id).delete();
   }
 
   void updateTimeFilter(TimeFilters filter) {
@@ -67,45 +72,3 @@ class MealsNotifier extends Notifier<List<Meal>> {
     }).toList();
   }
 }
-
-final dummyMeals = [
-  Meal(
-    id: "1",
-    appreciationMessage: "appreciationMessage",
-    audioUrl: "",
-    inputText: "input text",
-    userId: "asdasdqwewqewqe",
-    title: "Beispiel Mahlzeit Heute",
-    imageUrl: "",
-    //always today
-    date: DateTime.now(),
-    calories: 555,
-    macros: {Macro.carb: 20, Macro.protein: 30, Macro.fat: 20},
-  ),
-  Meal(
-    id: "2",
-    appreciationMessage: "appreciationMessage",
-    audioUrl: "",
-    inputText: "input text",
-    userId: "asdasdqwewqewqe",
-    title: "Beispiel Mahlzeit Gestern",
-    imageUrl: "",
-    // always a day ago
-    date: DateTime.now().subtract(Duration(days: 1)),
-    calories: 666,
-    macros: {Macro.carb: 33, Macro.protein: 22, Macro.fat: 11},
-  ),
-  Meal(
-    id: "3",
-    appreciationMessage: "appreciationMessage",
-    audioUrl: "",
-    inputText: "input text",
-    userId: "asdasdqwewqewqe",
-    title: "Beispiel Mahlzeit 8Tage",
-    imageUrl: "",
-    // always a day ago
-    date: DateTime.now().subtract(Duration(days: 8)),
-    calories: 666,
-    macros: {Macro.carb: 33, Macro.protein: 22, Macro.fat: 11},
-  ),
-];

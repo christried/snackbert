@@ -73,6 +73,32 @@ class Meal {
     };
   }
 
+  Meal copyWith({
+    String? id,
+    String? userId,
+    DateTime? date,
+    String? title,
+    String? appreciationMessage,
+    int? calories,
+    Map<Macro, int>? macros,
+    String? imageUrl,
+    String? audioUrl,
+    String? inputText,
+  }) {
+    return Meal(
+      id: id ?? this.id,
+      userId: userId ?? this.userId,
+      date: date ?? this.date,
+      title: title ?? this.title,
+      appreciationMessage: appreciationMessage ?? this.appreciationMessage,
+      calories: calories ?? this.calories,
+      macros: macros ?? this.macros,
+      imageUrl: imageUrl ?? this.imageUrl,
+      audioUrl: audioUrl ?? this.audioUrl,
+      inputText: inputText ?? this.inputText,
+    );
+  }
+
   static Map<String, int> _macrosToMap(Map<Macro, int> macros) {
     return {for (final entry in macros.entries) entry.key.name: entry.value};
   }

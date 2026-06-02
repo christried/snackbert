@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/data/snackbert_messages.dart';
@@ -6,8 +5,10 @@ import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/screens/meal_details.dart';
 import 'package:snackbert/utils/snackbar.dart';
+import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/nutrition_totals.dart';
 import 'package:snackbert/widgets/inputs/overview_filters.dart';
+import 'package:snackbert/widgets/loading_snackbert.dart';
 
 class OverviewScreen extends ConsumerWidget {
   const OverviewScreen({super.key});
@@ -59,20 +60,27 @@ class OverviewScreen extends ConsumerWidget {
     }
 
     return StreamBuilder(
-      stream: FirebaseFirestore.instance
-          .collection("meals")
-          .orderBy("date", descending: false)
-          .snapshots(),
+      stream: ref.read(mealsProvider.notifier).mealsStream,
       builder: (context, mealSnapshots) {
         if (mealSnapshots.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return LoadingSnackbert(status: 'waiting');
         }
 
         if (!mealSnapshots.hasData || mealSnapshots.data!.docs.isEmpty) {
-          return const Center(child: Text("keine meals"));
+          return const Center(
+            child: InfoBracket(
+              icon: Icon(Icons.warning_outlined),
+              text: "Bisher fehlen hier Einträge. Mach doch deinen Ersten!",
+            ),
+          );
         }
 
         if (mealSnapshots.hasError) {
+          showAppSnackBar(
+            context,
+            SnackbertMessages.randomErrorFallback,
+            isError: true,
+          );
           return const Center(child: Text("Error lol"));
         }
 
