@@ -88,6 +88,13 @@ class OverviewScreen extends ConsumerWidget {
             .map((doc) => Meal.fromMap({...doc.data()}))
             .toList();
 
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!context.mounted) return;
+          ref.read(mealsProvider.notifier).setMeals(loadedMeals);
+        });
+
+        final filteredMeals = ref.watch(mealsProvider);
+
         return Column(
           children: [
             OverviewFilters(),
@@ -99,9 +106,9 @@ class OverviewScreen extends ConsumerWidget {
                   indent: 16,
                   endIndent: 16,
                 ),
-                itemCount: loadedMeals.length,
+                itemCount: filteredMeals.length,
                 itemBuilder: (context, index) {
-                  final currentMeal = loadedMeals[index];
+                  final currentMeal = filteredMeals[index];
                   final calories = currentMeal.calories.toString();
                   final carbs = currentMeal.macros[Macro.carb];
                   final protein = currentMeal.macros[Macro.protein];

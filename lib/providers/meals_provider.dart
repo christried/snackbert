@@ -17,6 +17,9 @@ class MealsNotifier extends Notifier<List<Meal>> {
     return [];
   }
 
+  List<Meal> _allMeals = [];
+  TimeFilters _currentFilter = TimeFilters.allTime;
+
   final mealsStream = FirebaseFirestore.instance
       .collection("meals")
       .orderBy("date", descending: false)
@@ -41,21 +44,24 @@ class MealsNotifier extends Notifier<List<Meal>> {
   }
 
   void removeEntry(String id) {
-    state = state.where((meal) => meal.id != id).toList();
+    _allMeals = _allMeals.where((meal) => meal.id != id).toList();
+    state = _applyFilter(_allMeals, _currentFilter);
     FirebaseFirestore.instance.collection("meals").doc(id).delete();
   }
 
+  void setMeals(List<Meal> meals) {
+    _allMeals = meals;
+    state = _applyFilter(_allMeals, _currentFilter);
+  }
+
   void updateTimeFilter(TimeFilters filter) {
-    state = filter == TimeFilters.today
-        ? mealsForToday()
-        : filter == TimeFilters.thisWeek
-        ? mealsForThisWeek()
-        : dummyMeals;
+    _currentFilter = filter;
+    state = _applyFilter(_allMeals, _currentFilter);
   }
 
   List<Meal> mealsForToday() {
     final today = DateUtils.dateOnly(DateTime.now());
-    return dummyMeals
+    return _allMeals
         .where((meal) => DateUtils.dateOnly(meal.date) == today)
         .toList();
   }
@@ -65,10 +71,20 @@ class MealsNotifier extends Notifier<List<Meal>> {
     final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
     final startOfNextWeek = startOfWeek.add(const Duration(days: 7));
 
-    return dummyMeals.where((meal) {
+    return _allMeals.where((meal) {
       final mealDay = DateUtils.dateOnly(meal.date);
       return !mealDay.isBefore(startOfWeek) &&
           mealDay.isBefore(startOfNextWeek);
     }).toList();
+  }
+
+  List<Meal> _applyFilter(List<Meal> meals, TimeFilters filter) {
+    if (filter == TimeFilters.today) {
+      return mealsForToday();
+    }
+    if (filter == TimeFilters.thisWeek) {
+      return mealsForThisWeek();
+    }
+    return meals;
   }
 }
