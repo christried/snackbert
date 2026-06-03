@@ -18,7 +18,7 @@ class MealsNotifier extends Notifier<List<Meal>> {
   }
 
   List<Meal> _allMeals = [];
-  TimeFilters _currentFilter = TimeFilters.allTime;
+  TimeFilters _currentFilter = TimeFilters.today;
 
   final mealsStream = FirebaseFirestore.instance
       .collection("meals")

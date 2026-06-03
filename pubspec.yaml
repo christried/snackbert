@@ -81,6 +81,7 @@ flutter:
     - assets/snackbert_mascot_waiting2.png
     - assets/snackbert_mascot_mic.png
     - assets/snackbert_mascot_cam.png
+    - assets/snackbert_mascot_shrug.png
     - assets/snackbert_mascot.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
