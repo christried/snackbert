@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class LoadingSnackbert extends StatefulWidget {
-  const LoadingSnackbert({super.key, this.status = "eating"});
+  const LoadingSnackbert({super.key, this.status = "waiting"});
 
   final String status;
   @override

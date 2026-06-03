@@ -72,11 +72,10 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/snackbert_mascot_face_shush.png
     - assets/snackbert_mascot_face_error.png
     - assets/snackbert_mascot_face_think.png
     - assets/snackbert_mascot_face.png
-    - assets/snackbert_mascot_eating1.png
-    - assets/snackbert_mascot_eating2.png
     - assets/snackbert_mascot_waiting1.png
     - assets/snackbert_mascot_waiting2.png
     - assets/snackbert_mascot_mic.png

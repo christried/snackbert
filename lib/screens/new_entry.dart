@@ -75,7 +75,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
       if (_selectedImage == null) {
         final byteData = await rootBundle.load(
-          'assets/snackbert_mascot_eating2.png',
+          'assets/snackbert_mascot_face_shush.png',
         );
         final imageBytes = byteData.buffer.asUint8List();
 

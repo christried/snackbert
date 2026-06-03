@@ -64,6 +64,7 @@ class MealDetailsScreen extends ConsumerWidget {
           Hero(
             tag: meal.id,
             child: Image.network(
+              // TODO: Placeholder LoadingSnackbert on MealDetailsScreen for network image and circprog for overviewscreen little images
               meal.imageUrl,
               height: 300,
               width: double.infinity,
