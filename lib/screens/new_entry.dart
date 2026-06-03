@@ -1,7 +1,4 @@
-// ignore_for_file: avoid_print
-
 import 'dart:io';
-import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -58,20 +55,18 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     // to get rid of keyboard
     FocusScope.of(context).unfocus();
 
-    try {
-      final MealAnalysisResult mealAnalysisResult = await ref
-          .read(mealAnalysisServiceProvider)
-          .analyzeMeal(
-            text: hasText ? trimmedText : null,
-            image: _selectedImage,
-            audio: _recordedAudio,
-          );
+    String? storageImagePath;
+    String? storageAudioPath;
+    String fullImageUrl = '';
+    String fullAudioUrl = '';
+    String mealId = uuid.v4();
 
+    try {
       // add image to firebase
       final storageRef = FirebaseStorage.instance
           .ref()
           .child('meal_images')
-          .child("${Random().nextDouble() * 1000}.png");
+          .child("$mealId.png");
 
       if (_selectedImage == null) {
         final byteData = await rootBundle.load(
@@ -84,26 +79,35 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
         await storageRef.putFile(_selectedImage!);
       }
 
-      final imageUrl = await storageRef.getDownloadURL();
+      storageImagePath = 'meal_images/$mealId.png';
+      fullImageUrl = await storageRef.getDownloadURL();
 
       // add audio to firebase in case it exists - otherwise dont.
-      String audioUrl;
-      if (_recordedAudio == null) {
-        audioUrl = "";
-      } else {
+      if (_recordedAudio != null) {
         // upload and set audioUrl
         final audioStorageRef = FirebaseStorage.instance
             .ref()
             .child('meal_audios')
-            .child("${Random().nextDouble() * 1000}.m4a");
+            .child("$mealId.m4a");
 
         await audioStorageRef.putFile(_recordedAudio!);
 
-        audioUrl = await audioStorageRef.getDownloadURL();
+        storageAudioPath = 'meal_audios/$mealId.m4a';
+        fullAudioUrl = await audioStorageRef.getDownloadURL();
       }
 
+      final MealAnalysisResult mealAnalysisResult = await ref
+          .read(mealAnalysisServiceProvider)
+          .analyzeMeal(
+            text: hasText ? trimmedText : null,
+            imagePath: storageImagePath,
+            imageMimeType: 'image/png',
+            audioPath: storageAudioPath,
+            audioMimeType: _recordedAudio != null ? 'audio/m4a' : null,
+          );
+
       final Meal meal = Meal(
-        id: uuid.v4(),
+        id: mealId,
         userId: FirebaseAuth.instance.currentUser!.uid,
         date: DateTime.now(),
         title: mealAnalysisResult.title,
@@ -114,8 +118,8 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
           Macro.protein: mealAnalysisResult.proteins,
           Macro.fat: mealAnalysisResult.fats,
         },
-        imageUrl: imageUrl,
-        audioUrl: audioUrl,
+        imageUrl: fullImageUrl,
+        audioUrl: fullAudioUrl,
         inputText: _textInputController.text,
       );
 
@@ -129,18 +133,18 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
       if (!mounted) return;
 
-      showAppSnackBar(
-        context,
-        // TODO Motivational Quote + Meal Title will also be received by the LLM
-        "Das muss richtig lecker sein, ich liebe Erdnüsse!",
-      );
+      showAppSnackBar(context, mealAnalysisResult.appreciationMessage);
     } on ArgumentError catch (e) {
       showAppSnackBar(
         context,
         e.message ?? SnackbertMessages.randomErrorFallback,
         isError: true,
       );
-    } on Exception catch (_) {
+    } on Exception catch (e, stackTrace) {
+      // ignore: avoid_print
+      print("Error during meal submission: $e");
+      // ignore: avoid_print
+      print(stackTrace);
       showAppSnackBar(
         context,
         SnackbertMessages.randomErrorFallback,

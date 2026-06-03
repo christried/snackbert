@@ -1,42 +1,42 @@
-import 'dart:async';
-import 'dart:io';
-
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:snackbert/models/meal_analysis.dart';
-import 'package:uuid/uuid.dart';
 
 class MealAnalysisService {
-  MealAnalysisService();
+  final FirebaseFunctions _functions = FirebaseFunctions.instance;
 
   Future<MealAnalysisResult> analyzeMeal({
     String? text,
-    File? image,
-    File? audio,
+    String? imagePath,
+    String? imageMimeType,
+    String? audioPath,
+    String? audioMimeType,
   }) async {
-    final trimmedText = text?.trim();
-    final hasText = trimmedText != null && trimmedText.isNotEmpty;
-
-    if (!hasText && image == null && audio == null) {
-      throw ArgumentError(
-        'Irgendein Input muss schon da sein - Bild, Text oder Audio.',
+    try {
+      final HttpsCallable callable = _functions.httpsCallable(
+        'analyzeMealData',
       );
+
+      final Map<String, dynamic> payload = {};
+
+      if (text != null && text.isNotEmpty) payload['text'] = text;
+      if (imagePath != null) payload['imagePath'] = imagePath;
+      if (imageMimeType != null) payload['imageMimeType'] = imageMimeType;
+      if (audioPath != null) payload['audioPath'] = audioPath;
+      if (audioMimeType != null) payload['audioMimeType'] = audioMimeType;
+
+      final response = await callable.call(payload);
+
+      // Gemini API guarantees the defined responseSchema so
+      // response.data is guaranteed to be a Map<String, dynamic> (I hope)
+      final Map<String, dynamic> data = Map<String, dynamic>.from(
+        response.data as Map,
+      );
+
+      return MealAnalysisResult.fromMap(data);
+    } on FirebaseFunctionsException catch (e) {
+      throw Exception('Backend Error [${e.code}]: ${e.message}');
+    } catch (e) {
+      throw Exception('Failed to process meal analysis: $e');
     }
-
-    // To be used once stuff is uploaded again
-    // ignore: unused_local_variable
-    final uploadId = Uuid().v4();
-
-    // 4 seconds delay simulating the openAI API Call
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    // For now, return stub data
-    return MealAnalysisResult(
-      title: "added Test Mahlzeit",
-      appreciationMessage: "LECKER!!!",
-      calories: 0,
-      carbs: 0,
-      fats: 0,
-      proteins: 0,
-    );
   }
 }

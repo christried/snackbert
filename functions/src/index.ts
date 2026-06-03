@@ -1,6 +1,11 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import * as admin from "firebase-admin";
-import { GoogleGenAI, Type } from "@google/genai";
+import { Type } from "@google/genai";
+
+const { GoogleGenAI } = require("@google/genai");
+
+const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
+const GOOGLE_CLOUD_LOCATION = process.env.GOOGLE_CLOUD_LOCATION || "global";
 
 // Init Firebase Admin SDK
 admin.initializeApp();
@@ -63,7 +68,11 @@ export const analyzeMealData = onCall(
     }
 
     // Init AI SDK
-    const ai = new GoogleGenAI({ apiKey: apiKey });
+    const aiClient = new GoogleGenAI({
+      vertexai: true,
+      project: GOOGLE_CLOUD_PROJECT,
+      location: GOOGLE_CLOUD_LOCATION,
+    });
 
     const contents: any[] = [];
 
@@ -106,8 +115,8 @@ export const analyzeMealData = onCall(
     }
 
     try {
-      const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash", // TODO: Update to better model?
+      const response = await aiClient.models.generateContent({
+        model: "gemini-3-flash-preview", // TODO: Update to better model?
         contents: contents,
         config: {
           responseMimeType: "application/json",
