@@ -66,10 +66,6 @@ class OverviewScreen extends ConsumerWidget {
           return Center(child: LoadingSnackbert(status: 'waiting'));
         }
 
-        // if (!mealSnapshots.hasData || mealSnapshots.data!.docs.isEmpty) {
-        //   return const Center(child: EmptyListPlaceholder());
-        // }
-
         if (mealSnapshots.hasError) {
           showAppSnackBar(
             context,
@@ -120,9 +116,7 @@ class OverviewScreen extends ConsumerWidget {
                             // placeholder image
                             leading: Hero(
                               tag: currentMeal.id,
-                              child: Image.asset(
-                                'assets/snackbert_mascot_face.png',
-                              ),
+                              child: Image.network(currentMeal.imageUrl),
                             ),
                             title: Text(currentMeal.title),
                             subtitle: Row(

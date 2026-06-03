@@ -12,10 +12,11 @@ class LoadingSnackbert extends StatefulWidget {
 class _LoadingSnackbertState extends State<LoadingSnackbert> {
   // asset sets keyed by `widget.status` (eating | waiting)
   final Map<String, List<String>> _assetSets = const {
-    'eating': [
-      'assets/snackbert_mascot_eating1.png',
-      'assets/snackbert_mascot_eating2.png',
-    ],
+    // removed the eating assets for now since they are not really good and I want to focus on the waiting ones. But maybe add some better ones later?
+    // 'eating': [
+    //   'assets/snackbert_mascot_eating1.png',
+    //   'assets/snackbert_mascot_eating2.png',
+    // ],
     'waiting': [
       'assets/snackbert_mascot_waiting1.png',
       'assets/snackbert_mascot_waiting2.png',

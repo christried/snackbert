@@ -5,6 +5,7 @@ import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
+import 'package:snackbert/widgets/speech_bubble.dart';
 
 class MealDetailsScreen extends ConsumerWidget {
   const MealDetailsScreen({super.key, required this.meal});
@@ -59,10 +60,11 @@ class MealDetailsScreen extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         spacing: 16,
         children: [
+          SpeechBubble(text: meal.appreciationMessage),
           Hero(
             tag: meal.id,
-            child: Image.asset(
-              'assets/snackbert_mascot_face.png',
+            child: Image.network(
+              meal.imageUrl,
               height: 300,
               width: double.infinity,
             ),

@@ -75,7 +75,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
       if (_selectedImage == null) {
         final byteData = await rootBundle.load(
-          'assets/snackbert_mascot_face.png',
+          'assets/snackbert_mascot_eating2.png',
         );
         final imageBytes = byteData.buffer.asUint8List();
 
@@ -179,7 +179,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     return Scaffold(
       body: Center(
         child: isSubmitting
-            ? const LoadingSnackbert()
+            ? const LoadingSnackbert(status: "waiting")
             : Padding(
                 padding: EdgeInsetsGeometry.symmetric(
                   vertical: 0,
