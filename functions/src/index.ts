@@ -1,4 +1,5 @@
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { beforeUserCreated } from "firebase-functions/v2/identity";
 import * as admin from "firebase-admin";
 import { Type } from "@google/genai";
 
@@ -9,6 +10,23 @@ const GOOGLE_CLOUD_LOCATION = "global"; // this is NOT where the project lives r
 
 // Init Firebase Admin SDK
 admin.initializeApp();
+
+// white list (stored in firestore config collection)
+export const beforecreate = beforeUserCreated(async (event) => {
+  const email = event.data?.email;
+
+  const doc = await admin
+    .firestore()
+    .collection("config")
+    .doc("whitelist")
+    .get();
+
+  const allowedEmails: string[] = doc.data()?.emails ?? [];
+
+  if (!email || !allowedEmails.includes(email)) {
+    throw new HttpsError("permission-denied", "You're not on the white list.");
+  }
+});
 
 interface AnalyzeMealRequest {
   text?: string;

@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:health/health.dart';
 
 class HealthService {
