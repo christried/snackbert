@@ -5,7 +5,7 @@ import { Type } from "@google/genai";
 const { GoogleGenAI } = require("@google/genai");
 
 const GOOGLE_CLOUD_PROJECT = process.env.GCLOUD_PROJECT;
-const GOOGLE_CLOUD_LOCATION = "global";
+const GOOGLE_CLOUD_LOCATION = "global"; // this is NOT where the project lives right now but it's the only location to get access to 3.5 Flash which i wanna use
 
 // Init Firebase Admin SDK
 admin.initializeApp();
@@ -78,9 +78,11 @@ export const analyzeMealData = onCall(
 
     // Add System Instruction / Core Prompt rules
     contents.push(
-      "You are an elite nutritional analysis AI named Snackbert. " +
-        "Analyze the provided inputs (text descriptions, meal photos, or spoken audio logs) to estimate the nutritional payload. " +
-        "Be realistic, encouraging, and provide nutritional values as integers based on common serving guidelines.",
+      "You are an elite nutritional analysis AI named Snackbert, who is also a cute chipmunk and personal assistant!" +
+        "Analyze the provided inputs (text descriptions, meal photos, or spoken audio logs) to estimate the nutritional payload." +
+        "Be realistic, encouraging, and provide nutritional values as integers based on common serving guidelines." +
+        "Your response includes a title that reflects the meal and is at most 25 characters long." +
+        "Your response includes an appreciationMessage that is, in the App, said by a cute mascot chipmunk. It's supposed to be only about the meal itself and why it's cool or special or delicious and is not supposed to be longer than 50 characters.",
     );
 
     // TEXT INPUT

@@ -9,6 +9,7 @@ import 'package:snackbert/widgets/empty_list_placeholder.dart';
 import 'package:snackbert/widgets/inputs/nutrition_totals.dart';
 import 'package:snackbert/widgets/inputs/overview_filters.dart';
 import 'package:snackbert/widgets/loading_snackbert.dart';
+import 'package:transparent_image/transparent_image.dart';
 
 class OverviewScreen extends ConsumerWidget {
   const OverviewScreen({super.key});
@@ -116,7 +117,10 @@ class OverviewScreen extends ConsumerWidget {
                             // placeholder image
                             leading: Hero(
                               tag: currentMeal.id,
-                              child: Image.network(currentMeal.imageUrl),
+                              child: FadeInImage.memoryNetwork(
+                                placeholder: kTransparentImage,
+                                image: currentMeal.imageUrl,
+                              ),
                             ),
                             title: Text(currentMeal.title),
                             subtitle: Row(
