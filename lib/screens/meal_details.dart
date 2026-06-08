@@ -68,6 +68,7 @@ class MealDetailsScreen extends ConsumerWidget {
             child: FadeInImage.memoryNetwork(
               placeholder: kTransparentImage,
               image: meal.imageUrl,
+              height: 350,
             ),
           ),
 
