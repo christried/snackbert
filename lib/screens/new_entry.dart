@@ -1,23 +1,25 @@
 import 'dart:io';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:uuid/uuid.dart';
+import 'package:health/health.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/models/meal_analysis.dart';
-
 import 'package:snackbert/providers/meal_analysis_provider.dart';
 import 'package:snackbert/providers/meal_submitting_provider.dart';
+import 'package:snackbert/services/health_service.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
 import 'package:snackbert/widgets/inputs/meal_recorder.dart';
 import 'package:snackbert/widgets/loading_snackbert.dart';
-import 'package:uuid/uuid.dart';
 
 var uuid = Uuid();
 
@@ -50,6 +52,14 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
       );
       ref.read(mealSubmittingProvider.notifier).toggleSubmission();
       return;
+    }
+
+    MealType approximateMealType(DateTime time) {
+      final hour = time.hour;
+      if (hour >= 6 && hour < 11) return MealType.BREAKFAST;
+      if (hour >= 11 && hour < 15) return MealType.LUNCH;
+      if (hour >= 15 && hour < 22) return MealType.DINNER;
+      return MealType.SNACK;
     }
 
     // to get rid of keyboard
@@ -130,6 +140,18 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
           .collection("meals")
           .doc(mealPayload["id"])
           .set(mealPayload);
+
+      // add same meal to health connect as well
+      await HealthService.instance.logMeal(
+        name: mealAnalysisResult.title,
+        // Health wants double rather than int
+        calories: mealAnalysisResult.calories.toDouble(),
+        carbs: mealAnalysisResult.carbs.toDouble(),
+        protein: mealAnalysisResult.proteins.toDouble(),
+        fat: mealAnalysisResult.fats.toDouble(),
+        timestamp: meal.date,
+        mealType: approximateMealType(meal.date),
+      );
 
       if (!mounted) return;
 

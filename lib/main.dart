@@ -1,15 +1,15 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:snackbert/screens/splash.dart';
-import 'package:snackbert/screens/tabs.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
-
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:snackbert/screens/splash.dart';
+import 'package:snackbert/screens/tabs.dart';
+import 'package:snackbert/services/health_service.dart';
 import 'package:snackbert/screens/auth.dart';
 
 void main() async {
@@ -21,6 +21,8 @@ void main() async {
     serverClientId:
         '485628385430-msbug02lhhmrbqq437hghtl5r0rf6srt.apps.googleusercontent.com',
   );
+
+  await HealthService.instance.init();
 
   runApp(const ProviderScope(child: Snackbert()));
 }
