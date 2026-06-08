@@ -55,7 +55,7 @@ class HealthService {
         carbohydrates: carbs,
         protein: protein,
         fatTotal: fat,
-        startTime: timestamp,
+        startTime: timestamp.subtract(const Duration(seconds: 1)),
         endTime: timestamp,
         recordingMethod: RecordingMethod.manual,
       );
