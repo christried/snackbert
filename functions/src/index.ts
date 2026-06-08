@@ -4,8 +4,8 @@ import { Type } from "@google/genai";
 
 const { GoogleGenAI } = require("@google/genai");
 
-const GOOGLE_CLOUD_PROJECT = process.env.GOOGLE_CLOUD_PROJECT;
-const GOOGLE_CLOUD_LOCATION = process.env.GOOGLE_CLOUD_LOCATION || "global";
+const GOOGLE_CLOUD_PROJECT = process.env.GCLOUD_PROJECT;
+const GOOGLE_CLOUD_LOCATION = "global";
 
 // Init Firebase Admin SDK
 admin.initializeApp();
@@ -45,7 +45,7 @@ async function getStorageFileAsPart(storagePath: string, mimeType: string) {
 
 export const analyzeMealData = onCall(
   {
-    secrets: ["GEMINI_API_KEY"],
+    secrets: ["GEMINI_API_KEY"], // not really used anymore but I set it up so I'll just have it here if I move back from Vertex AI SDK to direct API calls
     maxInstances: 5, // rateLimiter, may be adjusted if we pass this to more than Mara + Me
   },
   async (request) => {
@@ -116,7 +116,7 @@ export const analyzeMealData = onCall(
 
     try {
       const response = await aiClient.models.generateContent({
-        model: "gemini-3-flash-preview", // TODO: Update to better model?
+        model: "gemini-3.5-flash",
         contents: contents,
         config: {
           responseMimeType: "application/json",
