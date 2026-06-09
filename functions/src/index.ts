@@ -94,8 +94,6 @@ export const analyzeMealData = onCall(
 
     const contents: any[] = [];
 
-    // TODO: Garantieren, dass immer nur lieb und keine Mengen oder eating habits kritisiert werden
-    // TODO: Namen der Gerichte in der appreciationMessage weglassen - nur ein kurzer Kommentar was am Gericht lecker, besonders oder toll ist.
     // Add System Instruction / Core Prompt rules
     contents.push(
       "You are an elite nutritional analysis AI named Snackbert, who is also a cute chipmunk and personal assistant!" +

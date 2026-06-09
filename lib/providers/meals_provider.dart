@@ -1,9 +1,12 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:snackbert/models/filters.dart';
 import 'package:snackbert/models/meal.dart';
-import 'package:uuid/uuid.dart';
 
 var uuid = Uuid();
 
@@ -22,6 +25,7 @@ class MealsNotifier extends Notifier<List<Meal>> {
 
   final mealsStream = FirebaseFirestore.instance
       .collection("meals")
+      .where("userId", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
       .orderBy("date", descending: false)
       .snapshots();
 
