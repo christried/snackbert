@@ -68,7 +68,7 @@ class MealDetailsScreen extends ConsumerWidget {
             child: FadeInImage.memoryNetwork(
               placeholder: kTransparentImage,
               image: meal.imageUrl,
-              height: 350,
+              height: 250,
             ),
           ),
 
@@ -79,7 +79,7 @@ class MealDetailsScreen extends ConsumerWidget {
             horMargin: 32,
           ),
 
-          SizedBox(height: 48),
+          SizedBox(height: 16),
 
           ElevatedButton(
             onPressed: () {
