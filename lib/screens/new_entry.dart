@@ -257,9 +257,8 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                         autocorrect: true,
                         enableSuggestions: true,
                         decoration: InputDecoration(
-                          // TODO: Make some more example texts to cycle through (also with the information text)
                           hintText:
-                              "z.B. 200g Sojageschnetzeltes, 1 Paprika, 2 EL Öl [...]",
+                              PlaceholderMessages.randomNewEntryTextInputHint,
                           hintStyle: TextStyle(color: Colors.black38),
                         ),
                       ),
