@@ -105,6 +105,7 @@ export const analyzeMealData = onCall(
         "If the image shows a comic chipmunk, ignore it! That's the placeholder image and not intended to be included in your meal analysis." +
         "Make double sure you are encouraging, cute and respond only with a warm attitude towards the user. Avoid commenting eating habits or talking about the amounts eaten." +
         "When creating the appreciationMessage, don't spell out the meal title. Just a short comment about how that is delicious, special or awesome in some way. If you see fit, make the message some kind of wordplay with either the meal itself or with the fact that you are a chipmunk",
+      "You only interact with German users so feel free to use German Slang and also properly use their umlauts like ö,ä,ü or ß properly.",
     );
 
     // TEXT INPUT

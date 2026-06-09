@@ -42,7 +42,7 @@ class Snackbert extends StatelessWidget {
         textTheme: GoogleFonts.fredokaTextTheme().copyWith(
           // HEADLINE AUTH SCREEN
           headlineLarge: GoogleFonts.fredoka(
-            fontSize: 64,
+            fontSize: 56,
             fontWeight: FontWeight.w600,
             letterSpacing: 3,
           ),
@@ -53,7 +53,7 @@ class Snackbert extends StatelessWidget {
           ),
           // APP BODY BIG TEXTs
           bodyLarge: GoogleFonts.fredoka(
-            fontSize: 20,
+            fontSize: 16,
             fontWeight: FontWeight.w500,
           ),
         ),

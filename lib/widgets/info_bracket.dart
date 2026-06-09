@@ -7,7 +7,7 @@ class InfoBracket extends StatelessWidget {
     super.key,
     required this.icon,
     required this.text,
-    this.horMargin = 32,
+    this.horMargin = 24,
   });
 
   final Icon icon;

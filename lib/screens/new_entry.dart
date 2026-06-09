@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:snackbert/data/placeholder_messages.dart';
 import 'package:uuid/uuid.dart';
 import 'package:health/health.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -209,7 +210,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
             : Padding(
                 padding: EdgeInsetsGeometry.symmetric(
                   vertical: 0,
-                  horizontal: 25,
+                  horizontal: 16,
                 ),
                 child: SingleChildScrollView(
                   child: Column(
@@ -217,11 +218,11 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                     children: [
                       InfoBracket(
                         icon: Icon(Icons.info_outline),
-                        text: "Eine Eingabe reicht total aus.",
+                        text: PlaceholderMessages.randomNewEntryInfoBoxMessage,
                         horMargin: 0,
                       ),
 
-                      SizedBox(height: 32),
+                      SizedBox(height: 16),
 
                       Row(
                         spacing: 8,
@@ -241,11 +242,11 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                         ],
                       ),
 
-                      SizedBox(height: 16),
+                      SizedBox(height: 8),
 
                       oderText,
 
-                      SizedBox(height: 16),
+                      SizedBox(height: 8),
 
                       TextField(
                         controller: _textInputController,
@@ -256,13 +257,14 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                         autocorrect: true,
                         enableSuggestions: true,
                         decoration: InputDecoration(
-                          hint: Text(
-                            "z.B. 200g Sojageschnetzeltes, 1 Paprika, 2 EL Öl [...]",
-                          ),
+                          // TODO: Make some more example texts to cycle through (also with the information text)
+                          hintText:
+                              "z.B. 200g Sojageschnetzeltes, 1 Paprika, 2 EL Öl [...]",
+                          hintStyle: TextStyle(color: Colors.black38),
                         ),
                       ),
 
-                      SizedBox(height: 16),
+                      SizedBox(height: 8),
 
                       ElevatedButton.icon(
                         icon: Icon(Icons.send),

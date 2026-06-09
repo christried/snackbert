@@ -75,7 +75,7 @@ class _AuthScreenState extends State<AuthScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
-          spacing: 16,
+          spacing: 12,
           children: [
             Text('snackbert', style: headlineStyle),
 
@@ -104,7 +104,7 @@ class _AuthScreenState extends State<AuthScreen> {
               text: 'Snackbert ist und bleibt lieb - hier judged dich niemand.',
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
 
             if (!_isAuthenticating)
               ElevatedButton.icon(
