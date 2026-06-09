@@ -27,7 +27,7 @@ As a developer, I focus on products that are easy to use, visually memorable, an
 - Riverpod
 - Firebase services
 - Image and audio input support
-- Custom branded UI (!AI generated assets!) with reusable widgets
+- Custom branded UI with reusable widgets
 
 ## In short
 
@@ -38,3 +38,7 @@ Snackbert is a compact example of the kind of app I like building: friendly, foc
 1. Install Flutter and run `flutter doctor`.
 2. Fetch dependencies with `flutter pub get`.
 3. Run the app with `flutter run`.
+
+## AI Disclaimer
+
+Snackbert Mascot Assets have been created using generative AI (Nano Banana 2).

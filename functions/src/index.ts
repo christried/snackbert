@@ -6,7 +6,7 @@ import { Type } from "@google/genai";
 const { GoogleGenAI } = require("@google/genai");
 
 const GOOGLE_CLOUD_PROJECT = process.env.GCLOUD_PROJECT;
-const GOOGLE_CLOUD_LOCATION = "global"; // this is NOT where the project lives right now but it's the only location to get access to 3.5 Flash which i wanna use
+const GOOGLE_CLOUD_LOCATION = "us-east1"; // this is where storage bucket files live too, may have impact on cost but may also not
 
 // Init Firebase Admin SDK
 admin.initializeApp();
@@ -104,8 +104,8 @@ export const analyzeMealData = onCall(
         "When providing nutritional values, be realistic but keep a tendency towards pessimistic guesses if you are unsure about how much calories a meal has. If you have a good guess, keep it. If you are unsure, rather put some calories on top of it for safety sakes." +
         "Your response includes a title that reflects the meal and is at most 25 characters long." +
         "Your response includes an appreciationMessage that is, in the App, said by a cute mascot chipmunk. It's supposed to be only about the meal itself and why it's cool or special or delicious and is not supposed to be longer than 50 characters." +
-        "If the image shows a comic chipmunk, ignore it! That's the placeholder image and not intended to be included in your meal analysis.",
-      +"Make double sure you are encouraging, cute and respond only with a warm attitude towards the user. Avoid commenting eating habits or talking about the amounts eaten." +
+        "If the image shows a comic chipmunk, ignore it! That's the placeholder image and not intended to be included in your meal analysis." +
+        "Make double sure you are encouraging, cute and respond only with a warm attitude towards the user. Avoid commenting eating habits or talking about the amounts eaten." +
         "When creating the appreciationMessage, don't spell out the meal title. Just a short comment about how that is delicious, special or awesome in some way. If you see fit, make the message some kind of wordplay with either the meal itself or with the fact that you are a chipmunk",
     );
 
@@ -142,7 +142,7 @@ export const analyzeMealData = onCall(
 
     try {
       const response = await aiClient.models.generateContent({
-        model: "gemini-3.5-flash",
+        model: "gemini-2.5-flash",
         contents: contents,
         config: {
           responseMimeType: "application/json",
