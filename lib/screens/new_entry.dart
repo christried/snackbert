@@ -37,6 +37,18 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
   File? _selectedImage;
   File? _recordedAudio;
   final _textInputController = TextEditingController();
+  bool _isAudioRecording = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _textInputController.addListener(_updateState);
+  }
+
+  void _updateState() {
+    setState(() {});
+  }
 
   Future<void> _onSendMeal() async {
     if (ref.read(mealSubmittingProvider)) return;
@@ -186,6 +198,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
   @override
   void dispose() {
+    _textInputController.removeListener(_updateState);
     _textInputController.dispose();
     super.dispose();
   }
@@ -202,6 +215,11 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     final oderText = Text("oder", style: TextStyle(color: Colors.black38));
 
     final isSubmitting = ref.watch(mealSubmittingProvider);
+
+    final hasInput =
+        _textInputController.text.trim().isNotEmpty ||
+        _selectedImage != null ||
+        _recordedAudio != null;
 
     return Scaffold(
       body: Center(
@@ -228,15 +246,30 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                         spacing: 8,
                         children: [
                           Expanded(
-                            child: MealImagePicker(
-                              onPickImage: (image) => _selectedImage = image,
+                            child: IgnorePointer(
+                              ignoring: _isAudioRecording,
+                              child: MealImagePicker(
+                                onPickImage: (image) {
+                                  setState(() {
+                                    _selectedImage = image;
+                                  });
+                                },
+                              ),
                             ),
                           ),
                           oderText,
                           Expanded(
                             child: MealRecorder(
-                              onPickAudio: (audioFile) =>
-                                  _recordedAudio = audioFile,
+                              onPickAudio: (audioFile) {
+                                setState(() {
+                                  _recordedAudio = audioFile;
+                                });
+                              },
+                              onRecordingStateChanged: (isRecording) {
+                                setState(() {
+                                  _isAudioRecording = isRecording;
+                                });
+                              },
                             ),
                           ),
                         ],
@@ -249,6 +282,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                       SizedBox(height: 8),
 
                       TextField(
+                        enabled: !_isAudioRecording,
                         controller: _textInputController,
                         maxLines: 3,
                         maxLength: 1000,
@@ -267,8 +301,11 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
                       ElevatedButton.icon(
                         icon: Icon(Icons.send),
-                        onPressed: _onSendMeal,
+                        onPressed: (hasInput && !_isAudioRecording)
+                            ? _onSendMeal
+                            : null,
                         label: Text("Eintragen"),
+
                         style: ElevatedButton.styleFrom(
                           backgroundColor: colors.primary,
                           foregroundColor: Colors.white,

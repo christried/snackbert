@@ -79,8 +79,6 @@ class MealDetailsScreen extends ConsumerWidget {
             horMargin: 32,
           ),
 
-          SizedBox(height: 16),
-
           ElevatedButton(
             onPressed: () {
               onEatAgain(context, ref);

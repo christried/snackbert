@@ -7,9 +7,14 @@ import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
 class MealRecorder extends StatefulWidget {
-  const MealRecorder({super.key, required this.onPickAudio});
+  const MealRecorder({
+    super.key,
+    required this.onPickAudio,
+    required this.onRecordingStateChanged,
+  });
 
   final void Function(File? audioFile) onPickAudio;
+  final void Function(bool isRecording) onRecordingStateChanged;
 
   @override
   State<MealRecorder> createState() => _MealRecorderState();
@@ -87,6 +92,8 @@ class _MealRecorderState extends State<MealRecorder> {
       _isRecording = true;
       _audioPath = null;
     });
+
+    widget.onRecordingStateChanged(true);
   }
 
   Future<void> _stopRecording() async {
@@ -100,6 +107,7 @@ class _MealRecorderState extends State<MealRecorder> {
       setState(() {
         _isRecording = false;
       });
+      widget.onRecordingStateChanged(false);
       return;
     }
 
@@ -114,6 +122,8 @@ class _MealRecorderState extends State<MealRecorder> {
       _isRecording = false;
       _audioPath = path;
     });
+
+    widget.onRecordingStateChanged(false);
   }
 
   Future<void> _toggleRecording() async {
