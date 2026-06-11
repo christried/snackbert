@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:snackbert/data/placeholder_messages.dart';
+import 'package:snackbert/providers/audio_recording_provider.dart';
 import 'package:uuid/uuid.dart';
 import 'package:health/health.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,7 +38,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
   File? _selectedImage;
   File? _recordedAudio;
   final _textInputController = TextEditingController();
-  bool _isAudioRecording = false;
 
   @override
   void initState() {
@@ -215,6 +215,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
     final oderText = Text("oder", style: TextStyle(color: Colors.black38));
 
     final isSubmitting = ref.watch(mealSubmittingProvider);
+    final isRecordingAudio = ref.watch(audioRecordingProvider);
 
     final hasInput =
         _textInputController.text.trim().isNotEmpty ||
@@ -247,7 +248,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                         children: [
                           Expanded(
                             child: IgnorePointer(
-                              ignoring: _isAudioRecording,
+                              ignoring: isRecordingAudio,
                               child: MealImagePicker(
                                 onPickImage: (image) {
                                   setState(() {
@@ -265,11 +266,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                                   _recordedAudio = audioFile;
                                 });
                               },
-                              onRecordingStateChanged: (isRecording) {
-                                setState(() {
-                                  _isAudioRecording = isRecording;
-                                });
-                              },
                             ),
                           ),
                         ],
@@ -282,7 +278,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                       SizedBox(height: 8),
 
                       TextField(
-                        enabled: !_isAudioRecording,
+                        enabled: !isRecordingAudio,
                         controller: _textInputController,
                         maxLines: 3,
                         maxLength: 1000,
@@ -301,7 +297,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
                       ElevatedButton.icon(
                         icon: Icon(Icons.send),
-                        onPressed: (hasInput && !_isAudioRecording)
+                        onPressed: (hasInput && !isRecordingAudio)
                             ? _onSendMeal
                             : null,
                         label: Text("Eintragen"),

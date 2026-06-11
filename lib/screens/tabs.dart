@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/data/snackbert_messages.dart';
+import 'package:snackbert/providers/audio_recording_provider.dart';
 import 'package:snackbert/providers/meal_submitting_provider.dart';
 
 import 'package:snackbert/screens/new_entry.dart';
@@ -39,6 +40,9 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     final colors = theme.colorScheme;
 
     final isSubmitting = ref.watch(mealSubmittingProvider);
+    final isRecordingAudio = ref.watch(audioRecordingProvider);
+
+    final isLocked = isSubmitting || isRecordingAudio;
 
     Widget activePage = const NewEntryScreen();
     var activePageTitle = "Neuer Eintrag";
@@ -49,21 +53,21 @@ class _TabsScreenState extends ConsumerState<TabsScreen> {
     }
 
     return PopScope(
-      canPop: !isSubmitting,
+      canPop: !isLocked,
       child: Scaffold(
         appBar: AppBar(
           title: Text(activePageTitle),
           backgroundColor: colors.secondaryContainer,
           actions: [
             IconButton.filled(
-              onPressed: isSubmitting ? null : _onTapLogOut,
+              onPressed: isLocked ? null : _onTapLogOut,
               icon: const Icon(Icons.logout),
             ),
           ],
         ),
         body: activePage,
         bottomNavigationBar: IgnorePointer(
-          ignoring: isSubmitting,
+          ignoring: isLocked,
           child: BottomNavigationBar(
             currentIndex: _selectedPageIndex,
             onTap: _selectPage,

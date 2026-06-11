@@ -117,9 +117,15 @@ class OverviewScreen extends ConsumerWidget {
                             // placeholder image
                             leading: Hero(
                               tag: currentMeal.id,
-                              child: FadeInImage.memoryNetwork(
-                                placeholder: kTransparentImage,
-                                image: currentMeal.imageUrl,
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(16),
+                                child: FadeInImage.memoryNetwork(
+                                  placeholder: kTransparentImage,
+                                  image: currentMeal.imageUrl,
+                                  width: 56,
+                                  height: 56,
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                             title: Text(currentMeal.title),

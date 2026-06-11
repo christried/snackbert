@@ -3,24 +3,21 @@ import 'dart:io';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
+import 'package:snackbert/providers/audio_recording_provider.dart';
 
-class MealRecorder extends StatefulWidget {
-  const MealRecorder({
-    super.key,
-    required this.onPickAudio,
-    required this.onRecordingStateChanged,
-  });
+class MealRecorder extends ConsumerStatefulWidget {
+  const MealRecorder({super.key, required this.onPickAudio});
 
   final void Function(File? audioFile) onPickAudio;
-  final void Function(bool isRecording) onRecordingStateChanged;
 
   @override
-  State<MealRecorder> createState() => _MealRecorderState();
+  ConsumerState<MealRecorder> createState() => _MealRecorderState();
 }
 
-class _MealRecorderState extends State<MealRecorder> {
+class _MealRecorderState extends ConsumerState<MealRecorder> {
   late final AudioRecorder _recorder;
 
   late PlayerController _playerController;
@@ -93,7 +90,7 @@ class _MealRecorderState extends State<MealRecorder> {
       _audioPath = null;
     });
 
-    widget.onRecordingStateChanged(true);
+    ref.read(audioRecordingProvider.notifier).isRecording();
   }
 
   Future<void> _stopRecording() async {
@@ -107,7 +104,7 @@ class _MealRecorderState extends State<MealRecorder> {
       setState(() {
         _isRecording = false;
       });
-      widget.onRecordingStateChanged(false);
+      ref.read(audioRecordingProvider.notifier).isNotRecording();
       return;
     }
 
@@ -123,7 +120,7 @@ class _MealRecorderState extends State<MealRecorder> {
       _audioPath = path;
     });
 
-    widget.onRecordingStateChanged(false);
+    ref.read(audioRecordingProvider.notifier).isNotRecording();
   }
 
   Future<void> _toggleRecording() async {
