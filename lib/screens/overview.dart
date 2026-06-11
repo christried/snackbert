@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import 'package:cached_network_image/cached_network_image.dart';
+
 import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/models/meal.dart';
 import 'package:snackbert/providers/meals_provider.dart';
@@ -9,7 +12,6 @@ import 'package:snackbert/widgets/empty_list_placeholder.dart';
 import 'package:snackbert/widgets/inputs/nutrition_totals.dart';
 import 'package:snackbert/widgets/inputs/overview_filters.dart';
 import 'package:snackbert/widgets/loading_snackbert.dart';
-import 'package:transparent_image/transparent_image.dart';
 
 class OverviewScreen extends ConsumerWidget {
   const OverviewScreen({super.key});
@@ -119,9 +121,18 @@ class OverviewScreen extends ConsumerWidget {
                               tag: currentMeal.id,
                               child: ClipRRect(
                                 borderRadius: BorderRadius.circular(16),
-                                child: FadeInImage.memoryNetwork(
-                                  placeholder: kTransparentImage,
-                                  image: currentMeal.imageUrl,
+                                child: CachedNetworkImage(
+                                  imageUrl: currentMeal.imageUrl,
+                                  progressIndicatorBuilder:
+                                      (context, url, downloadProgress) =>
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: CircularProgressIndicator(
+                                              value: downloadProgress.progress,
+                                            ),
+                                          ),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
                                   width: 56,
                                   height: 56,
                                   fit: BoxFit.cover,

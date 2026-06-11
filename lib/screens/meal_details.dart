@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:transparent_image/transparent_image.dart';
+
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/models/meal.dart';
@@ -65,10 +66,22 @@ class MealDetailsScreen extends ConsumerWidget {
           SpeechBubble(text: meal.appreciationMessage),
           Hero(
             tag: meal.id,
-            child: FadeInImage.memoryNetwork(
-              placeholder: kTransparentImage,
-              image: meal.imageUrl,
-              height: 250,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: CachedNetworkImage(
+                imageUrl: meal.imageUrl,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: CircularProgressIndicator(
+                        value: downloadProgress.progress,
+                      ),
+                    ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+                height: 300,
+                width: 300,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
 
