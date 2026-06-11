@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -16,6 +17,23 @@ class AuthScreen extends StatefulWidget {
 
 class _AuthScreenState extends State<AuthScreen> {
   bool _isAuthenticating = false;
+
+  /// Just request Persmissions for push notifications so i can inform about new app updates on Github Releases
+  void setupPushNotifications() async {
+    final fcm = FirebaseMessaging.instance;
+    await fcm.requestPermission();
+
+    // // This is what to store in database to connect the device token to a specific user to target them with push notifications
+    // final token = await fcm.getToken();
+    // print(token);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    setupPushNotifications();
+  }
 
   Future<void> _signInWithGoogle() async {
     setState(() {
