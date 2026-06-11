@@ -61,9 +61,10 @@ class MealDetailsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(meal.title)),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         spacing: 16,
         children: [
+          SizedBox(height: 32),
           SpeechBubble(text: meal.appreciationMessage),
           Hero(
             tag: meal.id,
