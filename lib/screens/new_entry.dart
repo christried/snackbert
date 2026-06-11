@@ -111,7 +111,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
           .analyzeMeal(
             text: hasText ? trimmedText : null,
             imagePath: storageImagePath,
-            imageMimeType: 'image/png',
+            imageMimeType: _selectedImage != null ? 'image/png' : null,
             audioPath: storageAudioPath,
             audioMimeType: _recordedAudio != null ? 'audio/m4a' : null,
           );

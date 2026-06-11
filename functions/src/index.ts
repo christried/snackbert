@@ -129,7 +129,7 @@ export const analyzeMealData = onCall(
     }
 
     // Sanity Check for missing user input
-    if (contents.length === 1) {
+    if (contents.length === 0) {
       throw new HttpsError(
         "invalid-argument",
         "Provide at least text description, an image, or an audio track.",
