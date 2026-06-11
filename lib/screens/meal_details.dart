@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:snackbert/data/placeholder_images.dart';
 
 import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/models/meal.dart';
@@ -77,7 +78,9 @@ class MealDetailsScreen extends ConsumerWidget {
                         value: downloadProgress.progress,
                       ),
                     ),
-                errorWidget: (context, url, error) => Icon(Icons.error),
+                errorWidget: (context, url, error) => Image.asset(
+                  PlaceholderImages.getPlaceholderForSingleMeal(meal.id),
+                ),
                 height: 300,
                 width: 300,
                 fit: BoxFit.cover,

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -86,24 +85,17 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
     try {
       // add image to firebase
-      final storageRef = FirebaseStorage.instance
-          .ref()
-          .child('meal_images')
-          .child("$mealId.png");
+      if (_selectedImage != null) {
+        final storageRef = FirebaseStorage.instance
+            .ref()
+            .child('meal_images')
+            .child("$mealId.png");
 
-      if (_selectedImage == null) {
-        final byteData = await rootBundle.load(
-          'assets/snackbert_mascot_face_shush.png',
-        );
-        final imageBytes = byteData.buffer.asUint8List();
-
-        await storageRef.putData(imageBytes);
-      } else {
         await storageRef.putFile(_selectedImage!);
-      }
 
-      storageImagePath = 'meal_images/$mealId.png';
-      fullImageUrl = await storageRef.getDownloadURL();
+        storageImagePath = 'meal_images/$mealId.png';
+        fullImageUrl = await storageRef.getDownloadURL();
+      }
 
       // add audio to firebase in case it exists - otherwise dont.
       if (_recordedAudio != null) {
