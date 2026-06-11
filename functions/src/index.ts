@@ -37,28 +37,18 @@ interface AnalyzeMealRequest {
 }
 
 /**
- * Helper function to download a file from Firebase Storage
- * and convert it into an inline data object for the Gemini SDK.
+ * Helper function to construct a Google Cloud Storage URI
+ * for the Gemini SDK (Vertex AI).
  */
-async function getStorageFileAsPart(storagePath: string, mimeType: string) {
-  try {
-    const bucket = admin.storage().bucket();
-    const file = bucket.file(storagePath);
+function getStorageFileAsPart(storagePath: string, mimeType: string) {
+  const bucketName = admin.storage().bucket().name;
 
-    const [fileBuffer] = await file.download();
-
-    return {
-      inlineData: {
-        data: fileBuffer.toString("base64"),
-        mimeType: mimeType,
-      },
-    };
-  } catch (error) {
-    throw new HttpsError(
-      "internal",
-      `Failed to fetch file from Storage path: ${storagePath}. Error: ${(error as Error).message}`,
-    );
-  }
+  return {
+    fileData: {
+      fileUri: `gs://${bucketName}/${storagePath}`,
+      mimeType: mimeType,
+    },
+  };
 }
 
 export const analyzeMealData = onCall(
@@ -115,7 +105,7 @@ export const analyzeMealData = onCall(
 
     // IMAGE INPUT
     if (data.imagePath && data.imageMimeType) {
-      const imagePart = await getStorageFileAsPart(
+      const imagePart = getStorageFileAsPart(
         data.imagePath,
         data.imageMimeType,
       );
@@ -124,7 +114,7 @@ export const analyzeMealData = onCall(
 
     // AUDIO INPUT
     if (data.audioPath && data.audioMimeType) {
-      const audioPart = await getStorageFileAsPart(
+      const audioPart = getStorageFileAsPart(
         data.audioPath,
         data.audioMimeType,
       );

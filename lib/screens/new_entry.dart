@@ -7,7 +7,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:snackbert/data/placeholder_messages.dart';
 import 'package:snackbert/providers/audio_recording_provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:health/health.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:snackbert/data/snackbert_messages.dart';
@@ -37,10 +36,14 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
   File? _selectedImage;
   File? _recordedAudio;
   final _textInputController = TextEditingController();
+  late String _infoBoxMessage;
+  late String _textInputHint;
 
   @override
   void initState() {
     super.initState();
+    _textInputHint = PlaceholderMessages.randomNewEntryTextInputHint;
+    _infoBoxMessage = PlaceholderMessages.randomNewEntryTextInputHint;
 
     _textInputController.addListener(_updateState);
   }
@@ -64,14 +67,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
       );
       ref.read(mealSubmittingProvider.notifier).toggleSubmission();
       return;
-    }
-
-    MealType approximateMealType(DateTime time) {
-      final hour = time.hour;
-      if (hour >= 6 && hour < 11) return MealType.BREAKFAST;
-      if (hour >= 11 && hour < 15) return MealType.LUNCH;
-      if (hour >= 15 && hour < 22) return MealType.DINNER;
-      return MealType.SNACK;
     }
 
     // to get rid of keyboard
@@ -155,7 +150,6 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
         protein: mealAnalysisResult.proteins.toDouble(),
         fat: mealAnalysisResult.fats.toDouble(),
         timestamp: meal.date,
-        mealType: approximateMealType(meal.date),
       );
 
       if (!mounted) return;
@@ -229,7 +223,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                     children: [
                       InfoBracket(
                         icon: Icon(Icons.info_outline),
-                        text: PlaceholderMessages.randomNewEntryInfoBoxMessage,
+                        text: _infoBoxMessage,
                         horMargin: 0,
                       ),
 
@@ -279,8 +273,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
                         autocorrect: true,
                         enableSuggestions: true,
                         decoration: InputDecoration(
-                          hintText:
-                              PlaceholderMessages.randomNewEntryTextInputHint,
+                          hintText: _textInputHint,
                           hintStyle: TextStyle(color: Colors.black38),
                         ),
                       ),

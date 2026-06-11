@@ -34,11 +34,18 @@ class HealthService {
     }
   }
 
+  MealType approximateMealType(DateTime time) {
+    final hour = time.hour;
+    if (hour >= 6 && hour < 11) return MealType.BREAKFAST;
+    if (hour >= 11 && hour < 15) return MealType.LUNCH;
+    if (hour >= 15 && hour < 22) return MealType.DINNER;
+    return MealType.SNACK;
+  }
+
   /// Writes a meal into health Connect incl. name, calories, mealType, macros and a timestamp
   Future<bool> logMeal({
     required String name,
     required double calories,
-    required MealType mealType,
     required double carbs,
     required double protein,
     required double fat,
@@ -52,7 +59,7 @@ class HealthService {
 
       bool success = await _health.writeMeal(
         name: name,
-        mealType: mealType,
+        mealType: approximateMealType(timestamp),
         caloriesConsumed: calories,
         carbohydrates: carbs,
         protein: protein,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:snackbert/services/health_service.dart';
 
 import 'package:uuid/uuid.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -45,6 +46,17 @@ class MealsNotifier extends Notifier<List<Meal>> {
         .collection("meals")
         .doc(mealPayload["id"])
         .set(mealPayload);
+
+    // add same meal to health connect as well
+    await HealthService.instance.logMeal(
+      name: meal.title,
+      // Health wants double rather than int
+      calories: meal.calories.toDouble(),
+      carbs: meal.macros[Macro.carb]!.toDouble(),
+      protein: meal.macros[Macro.protein]!.toDouble(),
+      fat: meal.macros[Macro.fat]!.toDouble(),
+      timestamp: meal.date,
+    );
   }
 
   void removeEntry(String id) {
