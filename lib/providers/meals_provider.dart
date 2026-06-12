@@ -22,7 +22,7 @@ class MealsNotifier extends Notifier<List<Meal>> {
   }
 
   List<Meal> _allMeals = [];
-  TimeFilters _currentFilter = TimeFilters.today;
+  TimeFilters currentFilter = TimeFilters.today;
 
   final mealsStream = FirebaseFirestore.instance
       .collection("meals")
@@ -61,18 +61,18 @@ class MealsNotifier extends Notifier<List<Meal>> {
 
   void removeEntry(String id) {
     _allMeals = _allMeals.where((meal) => meal.id != id).toList();
-    state = _applyFilter(_allMeals, _currentFilter);
+    state = _applyFilter(_allMeals, currentFilter);
     FirebaseFirestore.instance.collection("meals").doc(id).delete();
   }
 
   void setMeals(List<Meal> meals) {
     _allMeals = meals;
-    state = _applyFilter(_allMeals, _currentFilter);
+    state = _applyFilter(_allMeals, currentFilter);
   }
 
   void updateTimeFilter(TimeFilters filter) {
-    _currentFilter = filter;
-    state = _applyFilter(_allMeals, _currentFilter);
+    currentFilter = filter;
+    state = _applyFilter(_allMeals, currentFilter);
   }
 
   List<Meal> mealsForToday() {

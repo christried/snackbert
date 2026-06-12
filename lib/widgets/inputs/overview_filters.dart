@@ -25,6 +25,12 @@ class _OverviewFiltersState extends ConsumerState<OverviewFilters> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    _selectedFilter = ref.read(mealsProvider.notifier).currentFilter;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
