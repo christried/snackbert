@@ -13,24 +13,29 @@ class NutritionTotals extends ConsumerWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    final List<Meal> meals = ref.watch(mealsProvider);
+    final List<Meal> allMeals = ref.watch(mealsProvider);
+
+    // Only calculate for DONE Meals - this guarantees that values for calories and macros are there
+    final List<Meal> meals = allMeals.where((meal) {
+      return meal.status == MealStatus.done;
+    }).toList();
 
     final int totalCalories = meals.fold(
       0,
-      (prev, meal) => prev + meal.calories,
+      (prev, meal) => prev + (meal.calories ?? 0),
     );
     final int totalCarbs = meals.fold(
       0,
-      (prev, meal) => prev + (meal.macros[Macro.carb] ?? 0),
+      (prev, meal) => prev + (meal.macros![Macro.carb] ?? 0),
     );
     final int totalProtein = meals.fold(
       0,
-      (prev, meal) => prev + (meal.macros[Macro.protein] ?? 0),
+      (prev, meal) => prev + (meal.macros![Macro.protein] ?? 0),
     );
 
     final int totalFat = meals.fold(
       0,
-      (prev, meal) => prev + (meal.macros[Macro.fat] ?? 0),
+      (prev, meal) => prev + (meal.macros![Macro.fat] ?? 0),
     );
 
     return Container(

@@ -58,14 +58,15 @@ class MealDetailsScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
+    // Meal Details Screen can only be opened for Meals that are done so title, appreciationMessage and macros will always be set i think
     return Scaffold(
-      appBar: AppBar(title: Text(meal.title)),
+      appBar: AppBar(title: Text(meal.title!)),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         spacing: 16,
         children: [
           SizedBox(height: 32),
-          SpeechBubble(text: meal.appreciationMessage),
+          SpeechBubble(text: meal.appreciationMessage!),
           Hero(
             tag: meal.id,
             child: ClipRRect(
@@ -92,7 +93,7 @@ class MealDetailsScreen extends ConsumerWidget {
           InfoBracket(
             icon: Icon(Icons.local_fire_department),
             text:
-                '${meal.calories}kcal\nCarbs: ${meal.macros[Macro.carb] ?? 0}  Proteine: ${meal.macros[Macro.protein] ?? 0}  Fett: ${meal.macros[Macro.fat] ?? 0}',
+                '${meal.calories}kcal\nCarbs: ${meal.macros![Macro.carb] ?? 0}  Proteine: ${meal.macros![Macro.protein] ?? 0}  Fett: ${meal.macros![Macro.fat] ?? 0}',
             horMargin: 32,
           ),
 

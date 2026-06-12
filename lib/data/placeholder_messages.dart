@@ -33,4 +33,42 @@ class PlaceholderMessages {
 
   static String get randomNewEntryTextInputHint =>
       _newEntryTextInputHint[Random().nextInt(_newEntryTextInputHint.length)];
+
+  static final List<String> _newPendingCardTitle = [
+    "Nur ganz kurz noch...",
+    "Beep Boop...",
+    "Einen Moment, bitte...",
+    "Gleich fertig...",
+    "Mhhhh...",
+    "Sekündchen noch...",
+    "Wir mixen das kurz...",
+    "Fast geschafft...",
+    "Einen kleinen Augenblick...",
+    "Moment mal...",
+    "Gleich da...",
+    "Kurze Denkpause...",
+    "Wird serviert...",
+  ];
+
+  static String get randomNewPendingCardTitle =>
+      _newPendingCardTitle[Random().nextInt(_newPendingCardTitle.length)];
+
+  static final List<String> _newPendingCardSubtitle = [
+    "Snackbert denkt nach… 🐿️",
+    "Snackbert sortiert die Nüsse… 🥜",
+    "Da wird was Leckeres berechnet… 🧮",
+    "Snackbert spitzt die Bleistifte… ✏️",
+    "Die KI-Küche kocht schon… 🧑‍🍳",
+    "Hinter den Kulissen wird gewürfelt… 🎲",
+    "Snackbert knabbert an den Kabeln...äh, Daten 🐿️",
+    "Gleich landen die Infos auf deinem Teller… 🍽️",
+    "Snackbert wirft den Mixer an… 🌪️",
+    "Die Kalorien werden gezählt… 🔢",
+    "Snackbert schaut ganz genau hin… 👀",
+    "Einmal kurz Code-Salat umrühren… 🥗",
+    "Gleich ist Snackbert fertig mit Kauen… 🍏",
+  ];
+
+  static String get randomNewPendingCardSubtitle =>
+      _newPendingCardSubtitle[Random().nextInt(_newPendingCardSubtitle.length)];
 }

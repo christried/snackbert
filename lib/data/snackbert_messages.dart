@@ -94,6 +94,21 @@ class SnackbertMessages {
     "Alles leer! Keine Sorge, ich passe auf den Platz auf, bis du die Übersicht mit Leben füllst. ✨",
   ];
 
+  static final List<String> _analyzingMessages = [
+    "Ich bin dran! 🐿️",
+    "Brille sitzt, Abakus läuft... Lass mich kurz rechnen! 🧮",
+    "Moment, ich schiebe kurz die Perlen hin und her... 🧮",
+    "Snackbert im Rechenmodus! Meine Streifen glühen schon vor Konzentration. 🔥",
+    "Brille hochgeschoben! Jetzt wird das ganz haargenau analysiert. 👀",
+    "Klick-klack, klick-klack... Mein Abakus läuft auf Hochtouren! 🐿️",
+    "Gib mir ein Sekündchen, ich muss die Nüsse richtig sortieren.",
+    "Mit Brille hab' ich den Durchblick! Ich berechne das mal eben fix... 🧐",
+    "Halt die Backen steif, ich tippe... äh, schiebe das gerade durch mein Gerät hier! 🧮",
+    "Eichhörnchen-Wissenschaftler Snackbert ist am Werk. Daten werden analysiert! 🔬",
+    "Klick, klack, Perle nach links... Ja, das wird ein meisterhafter Eintrag! ✨",
+    "Ich gucke ganz genau durch meine schlaue Brille. Einen Moment noch...",
+  ];
+
   static String get randomGreeting =>
       _greetings[Random().nextInt(_greetings.length)];
 
@@ -114,4 +129,7 @@ class SnackbertMessages {
 
   static String get randomEmptyListMessage =>
       _emptyListMessages[Random().nextInt(_emptyListMessages.length)];
+
+  static String get randomAnalyzingMessage =>
+      _analyzingMessages[Random().nextInt(_analyzingMessages.length)];
 }

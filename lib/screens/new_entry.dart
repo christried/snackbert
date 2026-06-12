@@ -10,11 +10,7 @@ import 'package:uuid/uuid.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:snackbert/data/snackbert_messages.dart';
-import 'package:snackbert/models/meal.dart';
-import 'package:snackbert/models/meal_analysis.dart';
-import 'package:snackbert/providers/meal_analysis_provider.dart';
 import 'package:snackbert/providers/meal_submitting_provider.dart';
-import 'package:snackbert/services/health_service.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/info_bracket.dart';
 import 'package:snackbert/widgets/inputs/meal_image_picker.dart';
@@ -69,113 +65,61 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
       return;
     }
 
-    // to get rid of keyboard
     FocusScope.of(context).unfocus();
 
     String? storageImagePath;
     String? storageAudioPath;
-    String fullImageUrl = '';
-    String fullAudioUrl = '';
     String mealId = uuid.v4();
 
     try {
-      // add image to firebase
       if (_selectedImage != null) {
-        final storageRef = FirebaseStorage.instance
+        final ref = FirebaseStorage.instance
             .ref()
             .child('meal_images')
-            .child("$mealId.png");
-
-        await storageRef.putFile(_selectedImage!);
-
+            .child('$mealId.png');
+        await ref.putFile(_selectedImage!);
         storageImagePath = 'meal_images/$mealId.png';
-        fullImageUrl = await storageRef.getDownloadURL();
       }
 
-      // add audio to firebase in case it exists - otherwise dont.
       if (_recordedAudio != null) {
-        // upload and set audioUrl
-        final audioStorageRef = FirebaseStorage.instance
+        final ref = FirebaseStorage.instance
             .ref()
             .child('meal_audios')
-            .child("$mealId.m4a");
-
-        await audioStorageRef.putFile(_recordedAudio!);
-
+            .child('$mealId.m4a');
+        await ref.putFile(_recordedAudio!);
         storageAudioPath = 'meal_audios/$mealId.m4a';
-        fullAudioUrl = await audioStorageRef.getDownloadURL();
       }
+      await FirebaseFirestore.instance.collection('meals').doc(mealId).set({
+        'id': mealId,
+        'userId': FirebaseAuth.instance.currentUser!.uid,
+        'date': DateTime.now().toIso8601String(),
+        'status': 'pending',
+        'inputText': trimmedText,
+        'imagePath': storageImagePath,
+        'imageMimeType': _selectedImage != null ? 'image/png' : null,
+        'audioPath': storageAudioPath,
+        'audioMimeType': _recordedAudio != null ? 'audio/m4a' : null,
+      });
 
-      final MealAnalysisResult mealAnalysisResult = await ref
-          .read(mealAnalysisServiceProvider)
-          .analyzeMeal(
-            text: hasText ? trimmedText : null,
-            imagePath: storageImagePath,
-            imageMimeType: _selectedImage != null ? 'image/png' : null,
-            audioPath: storageAudioPath,
-            audioMimeType: _recordedAudio != null ? 'audio/m4a' : null,
-          );
-
-      final Meal meal = Meal(
-        id: mealId,
-        userId: FirebaseAuth.instance.currentUser!.uid,
-        date: DateTime.now(),
-        title: mealAnalysisResult.title,
-        appreciationMessage: mealAnalysisResult.appreciationMessage,
-        calories: mealAnalysisResult.calories,
-        macros: {
-          Macro.carb: mealAnalysisResult.carbs,
-          Macro.protein: mealAnalysisResult.proteins,
-          Macro.fat: mealAnalysisResult.fats,
-        },
-        imageUrl: fullImageUrl,
-        audioUrl: fullAudioUrl,
-        inputText: _textInputController.text,
-      );
-
-      final mealPayload = meal.toMap();
-
-      // add meal to database
-      await FirebaseFirestore.instance
-          .collection("meals")
-          .doc(mealPayload["id"])
-          .set(mealPayload);
-
-      // add same meal to health connect as well
-      await HealthService.instance.logMeal(
-        name: mealAnalysisResult.title,
-        // Health wants double rather than int
-        calories: mealAnalysisResult.calories.toDouble(),
-        carbs: mealAnalysisResult.carbs.toDouble(),
-        protein: mealAnalysisResult.proteins.toDouble(),
-        fat: mealAnalysisResult.fats.toDouble(),
-        timestamp: meal.date,
-      );
-
-      if (!mounted) return;
-
-      showAppSnackBar(context, mealAnalysisResult.appreciationMessage);
-    } on ArgumentError catch (e) {
-      showAppSnackBar(
-        context,
-        e.message ?? SnackbertMessages.randomErrorFallback,
-        isError: true,
-      );
-    } on Exception catch (e, stackTrace) {
-      // ignore: avoid_print
-      print("Error during meal submission: $e");
-      // ignore: avoid_print
-      print(stackTrace);
-      showAppSnackBar(
-        context,
-        SnackbertMessages.randomErrorFallback,
-        isError: true,
-      );
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          SnackbertMessages.randomAnalyzingMessage,
+          isAnalyzing: true,
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        showAppSnackBar(
+          context,
+          SnackbertMessages.randomErrorFallback,
+          isError: true,
+        );
+      }
     } finally {
       if (mounted) {
         ref.read(mealSubmittingProvider.notifier).toggleSubmission();
       }
-
       _selectedImage = null;
       _recordedAudio = null;
       _textInputController.clear();
