@@ -1,4 +1,4 @@
-import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { HttpsError } from "firebase-functions/v2/https";
 import { beforeUserCreated } from "firebase-functions/v2/identity";
 import * as admin from "firebase-admin";
 import { Type } from "@google/genai";
@@ -48,14 +48,6 @@ export const beforecreate = beforeUserCreated(async (event) => {
   }
 });
 
-interface AnalyzeMealRequest {
-  text?: string;
-  imagePath?: string;
-  imageMimeType?: string;
-  audioPath?: string;
-  audioMimeType?: string;
-}
-
 /**
  * Helper function to construct a Google Cloud Storage URI
  * for the Gemini SDK (Vertex AI).
@@ -70,145 +62,6 @@ function getStorageFileAsPart(storagePath: string, mimeType: string) {
     },
   };
 }
-
-// DEPRECATED
-// TODO: DELETE ONCE EVERYONE UPDATED THE APK
-export const analyzeMealData = onCall(
-  {
-    secrets: ["GEMINI_API_KEY"], // not really used anymore but I set it up so I'll just have it here if I move back from Vertex AI SDK to direct API calls
-    maxInstances: 5, // rateLimiter, may be adjusted if we pass this to more than Mara + Me
-  },
-  async (request) => {
-    // Ensure user is authenticated
-    if (!request.auth) {
-      throw new HttpsError(
-        "unauthenticated",
-        "The function must be called while authenticated.",
-      );
-    }
-
-    const data = request.data as AnalyzeMealRequest;
-    const apiKey = process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      throw new HttpsError(
-        "failed-precondition",
-        "Gemini API key is missing on the server configuration.",
-      );
-    }
-
-    // Init AI SDK
-    const aiClient = new GoogleGenAI({
-      vertexai: true,
-      project: GOOGLE_CLOUD_PROJECT,
-      location: GOOGLE_CLOUD_LOCATION,
-    });
-
-    const contents: any[] = [];
-
-    // TEXT INPUT
-    if (data.text && data.text.trim().length > 0) {
-      contents.push(`User description: ${data.text}`);
-    }
-
-    // IMAGE INPUT
-    if (data.imagePath && data.imageMimeType) {
-      const imagePart = getStorageFileAsPart(
-        data.imagePath,
-        data.imageMimeType,
-      );
-      contents.push(imagePart);
-    }
-
-    // AUDIO INPUT
-    if (data.audioPath && data.audioMimeType) {
-      const audioPart = getStorageFileAsPart(
-        data.audioPath,
-        data.audioMimeType,
-      );
-      contents.push(audioPart);
-    }
-
-    // Sanity Check for missing user input
-    if (contents.length === 0) {
-      throw new HttpsError(
-        "invalid-argument",
-        "Provide at least text description, an image, or an audio track.",
-      );
-    }
-
-    try {
-      const response = await aiClient.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: contents,
-        config: {
-          systemInstruction: snackbertSystemPrompt,
-          responseMimeType: "application/json",
-          responseSchema: {
-            type: Type.OBJECT,
-            properties: {
-              title: {
-                type: Type.STRING,
-                description:
-                  "A short descriptive title for the meal in German language.",
-              },
-              appreciationMessage: {
-                type: Type.STRING,
-                description:
-                  "A friendly, conversational appreciation message/feedback about the meal in German language.",
-              },
-              calories: {
-                type: Type.INTEGER,
-                description:
-                  "Total estimated calories (kcal) based on the strict formula: (carbs*4) + (proteins*4) + (fats*9).",
-              },
-              carbs: {
-                type: Type.INTEGER,
-                description:
-                  "Total carbohydrate count in grams as a strict integer value.",
-              },
-              fats: {
-                type: Type.INTEGER,
-                description:
-                  "Total fat count in grams as a strict integer value.",
-              },
-              proteins: {
-                type: Type.INTEGER,
-                description:
-                  "Total protein count in grams as a strict integer value.",
-              },
-            },
-            required: [
-              "title",
-              "appreciationMessage",
-              "calories",
-              "carbs",
-              "fats",
-              "proteins",
-            ],
-          },
-        },
-      });
-
-      const resultText = response.text;
-      if (!resultText) {
-        throw new HttpsError(
-          "internal",
-          "Received an empty evaluation from Gemini.",
-        );
-      }
-
-      // Doc says responseSchema is strict and cant fail so we just parse and hope I guess
-      return JSON.parse(resultText);
-    } catch (error) {
-      console.error("Gemini API error:", error);
-      throw new HttpsError(
-        "internal",
-        `Gemini API failed: ${(error as Error).message}`,
-      );
-    }
-  },
-);
 
 // New function to call GenAI and to replace the other one completely once nobody is calling that one anymore.
 export const processPendingMeal = onDocumentCreated(
@@ -297,7 +150,6 @@ export const processPendingMeal = onDocumentCreated(
       });
 
       const result = JSON.parse(response.text);
-      const bucketName = admin.storage().bucket().name;
 
       await mealRef.update({
         status: "done",
@@ -309,12 +161,6 @@ export const processPendingMeal = onDocumentCreated(
           protein: result.proteins,
           fat: result.fats,
         },
-        imageUrl: data.imagePath
-          ? `https://storage.googleapis.com/${bucketName}/${data.imagePath}`
-          : "",
-        audioUrl: data.audioPath
-          ? `https://storage.googleapis.com/${bucketName}/${data.audioPath}`
-          : "",
       });
     } catch (error) {
       console.error("processPendingMeal error:", error);

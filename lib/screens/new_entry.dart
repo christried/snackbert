@@ -69,6 +69,8 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
 
     String? storageImagePath;
     String? storageAudioPath;
+    String? imageUrl;
+    String? audioUrl;
     String mealId = uuid.v4();
 
     try {
@@ -79,6 +81,8 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
             .child('$mealId.png');
         await ref.putFile(_selectedImage!);
         storageImagePath = 'meal_images/$mealId.png';
+
+        imageUrl = await ref.getDownloadURL();
       }
 
       if (_recordedAudio != null) {
@@ -88,6 +92,8 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
             .child('$mealId.m4a');
         await ref.putFile(_recordedAudio!);
         storageAudioPath = 'meal_audios/$mealId.m4a';
+
+        audioUrl = await ref.getDownloadURL();
       }
       await FirebaseFirestore.instance.collection('meals').doc(mealId).set({
         'id': mealId,
@@ -96,8 +102,10 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
         'status': 'pending',
         'inputText': trimmedText,
         'imagePath': storageImagePath,
+        'imageUrl': imageUrl,
         'imageMimeType': _selectedImage != null ? 'image/png' : null,
         'audioPath': storageAudioPath,
+        'audioUrl': audioUrl,
         'audioMimeType': _recordedAudio != null ? 'audio/m4a' : null,
       });
 
