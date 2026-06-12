@@ -12,7 +12,7 @@ import 'package:snackbert/widgets/empty_list_placeholder.dart';
 import 'package:snackbert/widgets/error_meal_card.dart';
 import 'package:snackbert/widgets/inputs/nutrition_totals.dart';
 import 'package:snackbert/widgets/inputs/overview_filters.dart';
-import 'package:snackbert/widgets/inputs/pending_meal_card.dart';
+import 'package:snackbert/widgets/pending_meal_card.dart';
 import 'package:snackbert/widgets/loading_snackbert.dart';
 import 'package:snackbert/data/placeholder_images.dart';
 

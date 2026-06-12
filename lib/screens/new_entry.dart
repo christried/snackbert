@@ -101,9 +101,12 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
         'audioMimeType': _recordedAudio != null ? 'audio/m4a' : null,
       });
 
-      // TODO: Analyse-Platzhalter Texte einbauen
       if (mounted) {
-        showAppSnackBar(context, 'Snackbert analysiert deinen Snack! 🐿️');
+        showAppSnackBar(
+          context,
+          SnackbertMessages.randomAnalyzingMessage,
+          isAnalyzing: true,
+        );
       }
     } catch (e) {
       if (mounted) {

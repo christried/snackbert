@@ -4,6 +4,7 @@ void showAppSnackBar(
   BuildContext context,
   String message, {
   bool isError = false,
+  bool isAnalyzing = false,
 }) {
   final theme = Theme.of(context);
   final colors = theme.colorScheme;
@@ -12,9 +13,11 @@ void showAppSnackBar(
     leading: Image.asset(
       isError
           ? 'assets/snackbert_mascot_face_error.png'
+          : isAnalyzing
+          ? 'assets/snackbert_mascot_face_smart.png'
           : 'assets/snackbert_mascot_face.png',
-      width: 48,
-      height: 48,
+      width: 56,
+      height: 56,
     ),
     title: Text(
       message,

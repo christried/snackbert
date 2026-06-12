@@ -22,14 +22,14 @@ class ErrorMealCard extends StatelessWidget {
         ),
       ),
       title: Text(
-        // TODO: Generate more placeholders for error meal card
-        meal.inputText.isNotEmpty ? meal.inputText : "Analyse fehlgeschlagen",
+        meal.inputText.isNotEmpty
+            ? meal.inputText
+            : "Analyse fehlgeschlagen 😕",
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
       subtitle: Text(
-        // TODO: Generate more placeholders for error meal card - make users re-enter that meal
-        "Da ist was schiefgelaufen 😕",
+        "Bitte nochmal versuchen - vielleicht später dann?",
         style: theme.textTheme.bodySmall?.copyWith(
           color: theme.colorScheme.error,
         ),
