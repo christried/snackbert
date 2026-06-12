@@ -43,7 +43,7 @@ class _NewEntryScreenState extends ConsumerState<NewEntryScreen> {
   void initState() {
     super.initState();
     _textInputHint = PlaceholderMessages.randomNewEntryTextInputHint;
-    _infoBoxMessage = PlaceholderMessages.randomNewEntryTextInputHint;
+    _infoBoxMessage = PlaceholderMessages.randomNewEntryInfoBoxMessage;
 
     _textInputController.addListener(_updateState);
   }
