@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:snackbert/data/placeholder_images.dart';
 
 import 'package:snackbert/data/snackbert_messages.dart';
 import 'package:snackbert/models/meal.dart';
@@ -10,9 +9,12 @@ import 'package:snackbert/providers/meals_provider.dart';
 import 'package:snackbert/screens/meal_details.dart';
 import 'package:snackbert/utils/snackbar.dart';
 import 'package:snackbert/widgets/empty_list_placeholder.dart';
+import 'package:snackbert/widgets/error_meal_card.dart';
 import 'package:snackbert/widgets/inputs/nutrition_totals.dart';
 import 'package:snackbert/widgets/inputs/overview_filters.dart';
+import 'package:snackbert/widgets/inputs/pending_meal_card.dart';
 import 'package:snackbert/widgets/loading_snackbert.dart';
+import 'package:snackbert/data/placeholder_images.dart';
 
 class OverviewScreen extends ConsumerWidget {
   const OverviewScreen({super.key});
@@ -107,10 +109,28 @@ class OverviewScreen extends ConsumerWidget {
                       itemCount: filteredMeals.length,
                       itemBuilder: (context, index) {
                         final currentMeal = filteredMeals[index];
+
+                        // Pending Meal
+                        if (currentMeal.status == MealStatus.pending) {
+                          return PendingMealCard(
+                            meal: currentMeal,
+                            onRemove: () => onTapRemove(currentMeal.id),
+                          );
+                        }
+
+                        // Error Meal
+                        if (currentMeal.status == MealStatus.error) {
+                          return ErrorMealCard(
+                            meal: currentMeal,
+                            onRemove: () => onTapRemove(currentMeal.id),
+                          );
+                        }
+
+                        // Done Meal so macros will always be set :)
                         final calories = currentMeal.calories.toString();
-                        final carbs = currentMeal.macros[Macro.carb];
-                        final protein = currentMeal.macros[Macro.protein];
-                        final fat = currentMeal.macros[Macro.fat];
+                        final carbs = currentMeal.macros![Macro.carb];
+                        final protein = currentMeal.macros![Macro.protein];
+                        final fat = currentMeal.macros![Macro.fat];
 
                         return InkWell(
                           onTap: () {
@@ -143,7 +163,7 @@ class OverviewScreen extends ConsumerWidget {
                                 ),
                               ),
                             ),
-                            title: Text(currentMeal.title),
+                            title: Text(currentMeal.title!),
                             subtitle: Row(
                               spacing: 8,
                               children: [

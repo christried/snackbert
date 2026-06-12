@@ -2,6 +2,7 @@ import { onCall, HttpsError } from "firebase-functions/v2/https";
 import { beforeUserCreated } from "firebase-functions/v2/identity";
 import * as admin from "firebase-admin";
 import { Type } from "@google/genai";
+import { onDocumentCreated } from "firebase-functions/v2/firestore";
 
 const { GoogleGenAI } = require("@google/genai");
 
@@ -70,6 +71,8 @@ function getStorageFileAsPart(storagePath: string, mimeType: string) {
   };
 }
 
+// DEPRECATED
+// TODO: DELETE ONCE EVERYONE UPDATED THE APK
 export const analyzeMealData = onCall(
   {
     secrets: ["GEMINI_API_KEY"], // not really used anymore but I set it up so I'll just have it here if I move back from Vertex AI SDK to direct API calls
@@ -102,8 +105,6 @@ export const analyzeMealData = onCall(
     });
 
     const contents: any[] = [];
-
-    // moved systemPrompt to top of the file
 
     // TEXT INPUT
     if (data.text && data.text.trim().length > 0) {
@@ -205,6 +206,122 @@ export const analyzeMealData = onCall(
         "internal",
         `Gemini API failed: ${(error as Error).message}`,
       );
+    }
+  },
+);
+
+// New function to call GenAI and to replace the other one completely once nobody is calling that one anymore.
+export const processPendingMeal = onDocumentCreated(
+  "meals/{mealId}",
+  async (event) => {
+    const data = event.data?.data();
+    // ignores already-processed docs
+    if (!data || data.status !== "pending") return;
+
+    const mealId = event.params.mealId;
+    const mealRef = admin.firestore().collection("meals").doc(mealId);
+
+    try {
+      const aiClient = new GoogleGenAI({
+        vertexai: true,
+        project: GOOGLE_CLOUD_PROJECT,
+        location: GOOGLE_CLOUD_LOCATION,
+      });
+
+      const contents: any[] = [];
+      if (data.inputText?.trim())
+        contents.push(`User description: ${data.inputText}`);
+      if (data.imagePath && data.imageMimeType)
+        contents.push(getStorageFileAsPart(data.imagePath, data.imageMimeType));
+      if (data.audioPath && data.audioMimeType)
+        contents.push(getStorageFileAsPart(data.audioPath, data.audioMimeType));
+
+      if (contents.length === 0) {
+        await mealRef.update({
+          status: "error",
+          errorMessage: "No input provided.",
+        });
+        return;
+      }
+
+      const response = await aiClient.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents,
+        config: {
+          systemInstruction: snackbertSystemPrompt,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              title: {
+                type: Type.STRING,
+                description:
+                  "A short descriptive title for the meal in German language.",
+              },
+              appreciationMessage: {
+                type: Type.STRING,
+                description:
+                  "A friendly, conversational appreciation message/feedback about the meal in German language.",
+              },
+              calories: {
+                type: Type.INTEGER,
+                description:
+                  "Total estimated calories (kcal) based on the strict formula: (carbs*4) + (proteins*4) + (fats*9).",
+              },
+              carbs: {
+                type: Type.INTEGER,
+                description:
+                  "Total carbohydrate count in grams as a strict integer value.",
+              },
+              fats: {
+                type: Type.INTEGER,
+                description:
+                  "Total fat count in grams as a strict integer value.",
+              },
+              proteins: {
+                type: Type.INTEGER,
+                description:
+                  "Total protein count in grams as a strict integer value.",
+              },
+            },
+            required: [
+              "title",
+              "appreciationMessage",
+              "calories",
+              "carbs",
+              "fats",
+              "proteins",
+            ],
+          },
+        },
+      });
+
+      const result = JSON.parse(response.text);
+      const bucketName = admin.storage().bucket().name;
+
+      await mealRef.update({
+        status: "done",
+        title: result.title,
+        appreciationMessage: result.appreciationMessage,
+        calories: result.calories,
+        macros: {
+          carb: result.carbs,
+          protein: result.proteins,
+          fat: result.fats,
+        },
+        imageUrl: data.imagePath
+          ? `https://storage.googleapis.com/${bucketName}/${data.imagePath}`
+          : "",
+        audioUrl: data.audioPath
+          ? `https://storage.googleapis.com/${bucketName}/${data.audioPath}`
+          : "",
+      });
+    } catch (error) {
+      console.error("processPendingMeal error:", error);
+      await mealRef.update({
+        status: "error",
+        errorMessage: (error as Error).message,
+      });
     }
   },
 );

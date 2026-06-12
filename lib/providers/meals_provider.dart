@@ -35,7 +35,7 @@ class MealsNotifier extends Notifier<List<Meal>> {
       id: uuid.v4(),
       date: DateTime.now(),
       macros: Map.of(
-        meal.macros,
+        meal.macros!,
       ), // necessary "deep" copy so mutations are not shared. But maybe that would be nice too since its the same meal?
     );
 
@@ -49,12 +49,12 @@ class MealsNotifier extends Notifier<List<Meal>> {
 
     // add same meal to health connect as well
     await HealthService.instance.logMeal(
-      name: meal.title,
+      name: meal.title!,
       // Health wants double rather than int
-      calories: meal.calories.toDouble(),
-      carbs: meal.macros[Macro.carb]!.toDouble(),
-      protein: meal.macros[Macro.protein]!.toDouble(),
-      fat: meal.macros[Macro.fat]!.toDouble(),
+      calories: meal.calories!.toDouble(),
+      carbs: meal.macros![Macro.carb]!.toDouble(),
+      protein: meal.macros![Macro.protein]!.toDouble(),
+      fat: meal.macros![Macro.fat]!.toDouble(),
       timestamp: meal.date,
     );
   }

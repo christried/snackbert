@@ -26,6 +26,7 @@ void showAppSnackBar(
   messenger.hideCurrentSnackBar();
   messenger.showSnackBar(
     SnackBar(
+      duration: Duration(seconds: 6),
       content: content,
       backgroundColor: colors.primary,
       padding: const EdgeInsets.all(4),
