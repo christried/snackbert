@@ -153,9 +153,11 @@ class OverviewScreen extends ConsumerWidget {
                                 Text("F: $fat"),
                               ],
                             ),
-                            trailing: GestureDetector(
-                              onTap: () => onTapRemove(currentMeal.id),
-                              child: Icon(Icons.remove),
+                            trailing: IconButton(
+                              // padding to increase tappable area
+                              padding: const EdgeInsets.all(12),
+                              icon: const Icon(Icons.remove),
+                              onPressed: () => onTapRemove(currentMeal.id),
                             ),
                           ),
                         );
