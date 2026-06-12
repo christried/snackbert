@@ -23,6 +23,7 @@ class MealsNotifier extends Notifier<List<Meal>> {
 
   List<Meal> _allMeals = [];
   TimeFilters currentFilter = TimeFilters.today;
+  final Set<String> _healthSyncInProgress = {};
 
   final mealsStream = FirebaseFirestore.instance
       .collection("meals")
@@ -59,15 +60,55 @@ class MealsNotifier extends Notifier<List<Meal>> {
     );
   }
 
-  void removeEntry(String id) {
+  void removeEntry(String id) async {
+    final meal = _allMeals.firstWhere((m) => m.id == id);
+
+    if (meal.healthUuid != null) {
+      await HealthService.instance.removeFromHealth(
+        healthUuid: meal.healthUuid!,
+      );
+    }
+
     _allMeals = _allMeals.where((meal) => meal.id != id).toList();
     state = _applyFilter(_allMeals, currentFilter);
     FirebaseFirestore.instance.collection("meals").doc(id).delete();
   }
 
   void setMeals(List<Meal> meals) {
+    updateHealthSync(meals);
+
     _allMeals = meals;
     state = _applyFilter(_allMeals, currentFilter);
+  }
+
+  void updateHealthSync(List<Meal> meals) {
+    for (final meal in meals) {
+      if (meal.status == MealStatus.done &&
+          !meal.healthSynced &&
+          !_healthSyncInProgress.contains(meal.id)) {
+        _healthSyncInProgress.add(meal.id);
+
+        HealthService.instance
+            .logMeal(
+              name: meal.title!,
+              calories: meal.calories!.toDouble(),
+              carbs: meal.macros![Macro.carb]!.toDouble(),
+              protein: meal.macros![Macro.protein]!.toDouble(),
+              fat: meal.macros![Macro.fat]!.toDouble(),
+              timestamp: meal.date,
+            )
+            //logMeal returns String?
+            .then((healthUuid) {
+              FirebaseFirestore.instance
+                  .collection('meals')
+                  .doc(meal.id)
+                  .update({'healthSynced': true, 'healthUuid': healthUuid});
+            })
+            .catchError((_) {
+              _healthSyncInProgress.remove(meal.id);
+            });
+      }
+    }
   }
 
   void updateTimeFilter(TimeFilters filter) {

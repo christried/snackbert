@@ -18,6 +18,9 @@ class Meal {
     required this.userId,
     required this.date,
     required this.status,
+    // health
+    this.healthSynced = false,
+    this.healthUuid,
     // LLM fields
     this.title,
     this.appreciationMessage,
@@ -51,6 +54,8 @@ class Meal {
   final String? audioPath;
   final String? audioMimeType;
   final String? errorMessage;
+  final bool healthSynced;
+  final String? healthUuid;
 
   factory Meal.fromMap(Map<String, dynamic> map) {
     return Meal(
@@ -72,6 +77,8 @@ class Meal {
       audioPath: map['audioPath'] as String?,
       audioMimeType: map['audioMimeType'] as String?,
       errorMessage: map['errorMessage'] as String?,
+      healthSynced: (map['healthSynced'] as bool?) ?? false,
+      healthUuid: map['healthUuid'] as String?,
     );
   }
 
@@ -93,6 +100,8 @@ class Meal {
       'audioPath': audioPath,
       'audioMimeType': audioMimeType,
       'errorMessage': errorMessage,
+      'healthSynced': healthSynced,
+      'healthUuid': healthUuid,
     };
   }
 
@@ -113,6 +122,8 @@ class Meal {
     String? audioPath,
     String? audioMimeType,
     String? errorMessage,
+    bool? healthSynced,
+    String? healthUuid,
   }) {
     return Meal(
       id: id ?? this.id,
@@ -131,6 +142,8 @@ class Meal {
       audioPath: audioPath ?? this.audioPath,
       audioMimeType: audioMimeType ?? this.audioMimeType,
       errorMessage: errorMessage ?? this.errorMessage,
+      healthSynced: healthSynced ?? this.healthSynced,
+      healthUuid: healthUuid ?? this.healthUuid,
     );
   }
 

@@ -16,6 +16,8 @@ class HealthService {
     try {
       await _health.configure();
       _isInitialized = true;
+
+      await requestPermissions();
     } catch (e) {
       print("error while initializing health: $e");
     }
@@ -43,7 +45,7 @@ class HealthService {
   }
 
   /// Writes a meal into health Connect incl. name, calories, mealType, macros and a timestamp
-  Future<bool> logMeal({
+  Future<String?> logMeal({
     required String name,
     required double calories,
     required double carbs,
@@ -55,7 +57,10 @@ class HealthService {
 
     try {
       bool hasPermission = await requestPermissions();
-      if (!hasPermission) return false;
+      if (!hasPermission) return null;
+
+      final startTime = timestamp.subtract(const Duration(seconds: 1));
+      final endTime = timestamp;
 
       bool success = await _health.writeMeal(
         name: name,
@@ -64,15 +69,43 @@ class HealthService {
         carbohydrates: carbs,
         protein: protein,
         fatTotal: fat,
-        startTime: timestamp.subtract(const Duration(seconds: 1)),
-        endTime: timestamp,
+        startTime: startTime,
+        endTime: endTime,
         recordingMethod: RecordingMethod.manual,
       );
 
-      return success;
+      if (!success) return null;
+
+      // Get the UUID of the new record to edit/delete it later
+      final results = await _health.getHealthDataFromTypes(
+        types: [HealthDataType.NUTRITION],
+        startTime: startTime,
+        endTime: endTime,
+      );
+
+      final match = results.firstWhere(
+        (p) =>
+            p.value is NutritionHealthValue &&
+            (p.value as NutritionHealthValue).name == name,
+        orElse: () => results.first,
+      );
+
+      return match.uuid.isNotEmpty ? match.uuid : null;
     } catch (e) {
       print("error writing the meal to Health Connect: $e");
-      return false;
+      return null;
+    }
+  }
+
+  Future<void> removeFromHealth({required String healthUuid}) async {
+    if (!_isInitialized) await init();
+    try {
+      await _health.deleteByUUID(
+        type: HealthDataType.NUTRITION,
+        uuid: healthUuid,
+      );
+    } catch (e) {
+      print("error removing meal from Health Connect: $e");
     }
   }
 }
