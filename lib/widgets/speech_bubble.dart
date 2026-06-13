@@ -10,6 +10,7 @@ class SpeechBubble extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
+      margin: EdgeInsets.symmetric(horizontal: 40),
       padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainer,
@@ -22,6 +23,7 @@ class SpeechBubble extends StatelessWidget {
       ),
       child: Text(
         text,
+        textAlign: TextAlign.center,
         style: TextStyle(
           color: theme.colorScheme.onSurfaceVariant,
           fontSize: 16,

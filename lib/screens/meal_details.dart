@@ -62,11 +62,12 @@ class MealDetailsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(meal.title!)),
       body: Column(
+        spacing: 12,
         mainAxisAlignment: MainAxisAlignment.start,
-        spacing: 16,
         children: [
-          SizedBox(height: 32),
+          SizedBox(height: 8),
           SpeechBubble(text: meal.appreciationMessage!),
+
           Hero(
             tag: meal.id,
             child: ClipRRect(
@@ -83,7 +84,7 @@ class MealDetailsScreen extends ConsumerWidget {
                 errorWidget: (context, url, error) => Image.asset(
                   PlaceholderImages.getPlaceholderForSingleMeal(meal.id),
                 ),
-                height: 300,
+                height: 250,
                 width: 300,
                 fit: BoxFit.cover,
               ),

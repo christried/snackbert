@@ -65,6 +65,17 @@ class OverviewScreen extends ConsumerWidget {
       );
     }
 
+    // I want the snackbar but also snackbars cant be triggered while building (fails) so this delays it until after failure finished
+    void onSnapshotsError() {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showAppSnackBar(
+          context,
+          SnackbertMessages.randomErrorFallback,
+          isError: true,
+        );
+      });
+    }
+
     return StreamBuilder(
       stream: ref.read(mealsProvider.notifier).mealsStream,
       builder: (context, mealSnapshots) {
@@ -73,11 +84,7 @@ class OverviewScreen extends ConsumerWidget {
         }
 
         if (mealSnapshots.hasError) {
-          showAppSnackBar(
-            context,
-            SnackbertMessages.randomErrorFallback,
-            isError: true,
-          );
+          onSnapshotsError();
           return const Center(child: Text("Error lol"));
         }
 

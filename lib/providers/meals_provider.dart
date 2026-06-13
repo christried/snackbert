@@ -28,7 +28,7 @@ class MealsNotifier extends Notifier<List<Meal>> {
   final mealsStream = FirebaseFirestore.instance
       .collection("meals")
       .where("userId", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
-      .orderBy("date", descending: false)
+      .orderBy("date", descending: true)
       .snapshots();
 
   void duplicateEntry(Meal meal) async {
