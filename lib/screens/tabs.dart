@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:snackbert/data/snackbert_messages.dart';
@@ -7,6 +8,7 @@ import 'package:snackbert/providers/meal_submitting_provider.dart';
 
 import 'package:snackbert/screens/new_entry.dart';
 import 'package:snackbert/screens/overview.dart';
+import 'package:snackbert/services/update_service.dart';
 import 'package:snackbert/utils/snackbar.dart';
 
 class TabsScreen extends ConsumerStatefulWidget {
@@ -21,6 +23,32 @@ class TabsScreen extends ConsumerStatefulWidget {
 class _TabsScreenState extends ConsumerState<TabsScreen> {
   // Page Selection
   int _selectedPageIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _setupUpdateCheck();
+  }
+
+  void _setupUpdateCheck() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      UpdateService.checkForUpdate(context);
+    });
+
+    // App opened from a notification tap (background state)
+    FirebaseMessaging.onMessageOpenedApp.listen((message) {
+      if (message.data['type'] == 'update' && mounted) {
+        UpdateService.showUpdateDialog(context);
+      }
+    });
+
+    // App opened from a notification tap (terminated state)
+    FirebaseMessaging.instance.getInitialMessage().then((message) {
+      if (message?.data['type'] == 'update' && mounted) {
+        UpdateService.showUpdateDialog(context);
+      }
+    });
+  }
 
   void _selectPage(int index) {
     setState(() {
