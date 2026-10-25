@@ -1,7 +1,7 @@
 import { HttpsError } from "firebase-functions/v2/https";
 import { beforeUserCreated } from "firebase-functions/v2/identity";
 import * as admin from "firebase-admin";
-import { ThinkingLevel, Type } from "@google/genai";
+import { FinishReason, ThinkingLevel, Type } from "@google/genai";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 
 const { GoogleGenAI } = require("@google/genai");
@@ -198,7 +198,9 @@ export const processPendingMeal = onDocumentCreated(
 
       // Gemini 3 counts thinking and visible output against maxOutputTokens,
       // so a cut-off run can still return non-empty text. Catch it here.
-      if (researchResponse.candidates?.[0]?.finishReason === "MAX_TOKENS")
+      if (
+        researchResponse.candidates?.[0]?.finishReason === FinishReason.MAX_TOKENS
+      )
         throw new Error(
           "Phase 1 (research) was cut off by maxOutputTokens before it finished.",
         );
@@ -234,7 +236,9 @@ export const processPendingMeal = onDocumentCreated(
         },
       });
 
-      if (formatResponse.candidates?.[0]?.finishReason === "MAX_TOKENS")
+      if (
+        formatResponse.candidates?.[0]?.finishReason === FinishReason.MAX_TOKENS
+      )
         throw new Error(
           "Phase 2 (format) was cut off by maxOutputTokens before it finished.",
         );
