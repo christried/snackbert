@@ -1,7 +1,7 @@
 import { HttpsError } from "firebase-functions/v2/https";
 import { beforeUserCreated } from "firebase-functions/v2/identity";
 import * as admin from "firebase-admin";
-import { Type } from "@google/genai";
+import { FinishReason, ThinkingLevel, Type } from "@google/genai";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
 
 const { GoogleGenAI } = require("@google/genai");
@@ -76,7 +76,7 @@ Only when writing your final output values, round carbs, fats, proteins, and cal
 5. VEGAN FLAIR: All meals are 100% plant-based. Only occasionally — maybe one in four or five responses — let that quietly shine through in the title or appreciationMessage when it fits naturally. Never force it into every response.`;
 
 const GOOGLE_CLOUD_PROJECT = process.env.GCLOUD_PROJECT;
-const GOOGLE_CLOUD_LOCATION = "us-east1";
+const GOOGLE_CLOUD_LOCATION = "europe-west1";
 
 admin.initializeApp();
 
@@ -186,16 +186,24 @@ export const processPendingMeal = onDocumentCreated(
 
       // Step 1: Researching Assistant
       const researchResponse = await aiClient.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.8-flash",
         contents: inputParts,
         config: {
           systemInstruction: snackbertResearchPrompt,
           tools: [{ googleSearch: {} }],
-          temperature: 0.3,
-          maxOutputTokens: 3072,
-          thinkingConfig: { thinkingBudget: 1024 },
+          maxOutputTokens: 16384,
+          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
         },
       });
+
+      // Gemini 3 counts thinking and visible output against maxOutputTokens,
+      // so a cut-off run can still return non-empty text. Catch it here.
+      if (
+        researchResponse.candidates?.[0]?.finishReason === FinishReason.MAX_TOKENS
+      )
+        throw new Error(
+          "Phase 1 (research) was cut off by maxOutputTokens before it finished.",
+        );
 
       const researchFindings = researchResponse.text;
       if (!researchFindings?.trim()) {
@@ -217,17 +225,23 @@ export const processPendingMeal = onDocumentCreated(
 
       // Step 2: Snackbert
       const formatResponse = await aiClient.models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3.1-flash-lite",
         contents: [`Researcher findings:\n${researchFindings}`],
         config: {
           systemInstruction: snackbertFormatPrompt,
           responseMimeType: "application/json",
           responseSchema: snackbertOutputSchema,
-          temperature: 0.3,
-          maxOutputTokens: 1024,
-          thinkingConfig: { thinkingBudget: 512 },
+          maxOutputTokens: 4096,
+          thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
         },
       });
+
+      if (
+        formatResponse.candidates?.[0]?.finishReason === FinishReason.MAX_TOKENS
+      )
+        throw new Error(
+          "Phase 2 (format) was cut off by maxOutputTokens before it finished.",
+        );
 
       const result = JSON.parse(formatResponse.text);
 
