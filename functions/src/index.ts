@@ -76,7 +76,10 @@ Only when writing your final output values, round carbs, fats, proteins, and cal
 5. VEGAN FLAIR: All meals are 100% plant-based. Only occasionally — maybe one in four or five responses — let that quietly shine through in the title or appreciationMessage when it fits naturally. Never force it into every response.`;
 
 const GOOGLE_CLOUD_PROJECT = process.env.GCLOUD_PROJECT;
-const GOOGLE_CLOUD_LOCATION = "europe-west1";
+// Gemini 3.8 Flash and 3.1 Flash-Lite aren't served on single European
+// regions (europe-west1 returns 404). The EU multi-region keeps processing
+// in Europe.
+const GOOGLE_CLOUD_LOCATION = "eu";
 
 admin.initializeApp();
 
