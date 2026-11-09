@@ -57,11 +57,11 @@ function portionParts(meal: MealInput, bucketName: string, besideDish: boolean):
 const DISH_IMAGE_LABELS = new Map([
   [
     "post",
-    "The Dish's picture from the post: it shows the Dish as the post published it, not the user's portion.",
+    "The Dish's picture from the post: it shows the Dish as the post published it, maybe the whole batch (a full pot, a tray), not the user's portion.",
   ],
   [
     "ownPhoto",
-    "The user's own photo of the Dish as they cooked it, not necessarily their portion.",
+    "The user's own photo of the Dish as they cooked it: it may show the whole batch, not necessarily their portion.",
   ],
 ]);
 
@@ -78,7 +78,7 @@ function dishParts(dish: MealDish, bucketName: string): ResearchPart[] {
 
   if (dish.caption?.trim())
     parts.push(
-      "Caption of the post (written by the post's author, not by the user):\n" +
+      "Caption of the post (written by the post's author, not by the user; its amounts may be for the whole recipe, not one serving):\n" +
         dish.caption.trim(),
     );
 
@@ -96,7 +96,7 @@ export function buildResearchInput(meal: MealInput, bucketName: string): Researc
   const portion = portionParts(meal, bucketName, true);
   const parts = [...dishParts(dish, bucketName), ...portion];
   if (portion.length === 0)
-    parts.push("No portion input from the user: count one normal portion of this Dish.");
+    parts.push("No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.");
   return parts;
 }
 

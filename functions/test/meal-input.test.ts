@@ -24,7 +24,7 @@ describe("buildResearchInput", () => {
     expect(buildResearchInput({ inputText: "  " }, BUCKET)).toEqual([]);
   });
 
-  it("reports a Dish alone as one normal portion", () => {
+  it("reports a Dish alone as one normal serving, not the whole batch", () => {
     const meal = {
       inputText: "",
       imagePath: null,
@@ -35,11 +35,11 @@ describe("buildResearchInput", () => {
 
     expect(buildResearchInput(meal, BUCKET)).toEqual([
       "Dish from malkochen (what the user cooked):\nTitle: Linsen-Dal",
-      "No portion input from the user: count one normal portion of this Dish.",
+      "No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.",
     ]);
   });
 
-  it("tells where the Dish came from, with the Caption marked as the post's text", () => {
+  it("tells where the Dish came from, with the Caption marked as the post's text, maybe for the whole recipe", () => {
     const meal = {
       malkochen: {
         dish: dish({
@@ -57,13 +57,13 @@ describe("buildResearchInput", () => {
         "Source link: https://www.tiktok.com/@koch/video/123\n" +
         "Platform: TikTok\n" +
         "Creator: @koch",
-      "Caption of the post (written by the post's author, not by the user):\n" +
+      "Caption of the post (written by the post's author, not by the user; its amounts may be for the whole recipe, not one serving):\n" +
         "Mein Dal mit roten Linsen #vegan",
-      "No portion input from the user: count one normal portion of this Dish.",
+      "No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.",
     ]);
   });
 
-  it("says the post's picture shows the Dish as published, not the portion", () => {
+  it("says the post's picture shows the Dish as published, maybe the whole batch, not the portion", () => {
     const meal = {
       malkochen: {
         dish: dish({
@@ -76,13 +76,13 @@ describe("buildResearchInput", () => {
 
     expect(buildResearchInput(meal, BUCKET)).toEqual([
       "Dish from malkochen (what the user cooked):\nTitle: Linsen-Dal",
-      "The Dish's picture from the post: it shows the Dish as the post published it, not the user's portion.",
+      "The Dish's picture from the post: it shows the Dish as the post published it, maybe the whole batch (a full pot, a tray), not the user's portion.",
       { fileData: { fileUri: "gs://snackbert-test.appspot.com/malkochen_dish_images/m2.webp", mimeType: "image/webp" } },
-      "No portion input from the user: count one normal portion of this Dish.",
+      "No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.",
     ]);
   });
 
-  it("says an Own Photo shows the Dish as the user cooked it", () => {
+  it("says an Own Photo shows the Dish as the user cooked it, maybe the whole batch", () => {
     const meal = {
       malkochen: {
         dish: dish({
@@ -95,9 +95,9 @@ describe("buildResearchInput", () => {
 
     expect(buildResearchInput(meal, BUCKET)).toEqual([
       "Dish from malkochen (what the user cooked):\nTitle: Linsen-Dal",
-      "The user's own photo of the Dish as they cooked it, not necessarily their portion.",
+      "The user's own photo of the Dish as they cooked it: it may show the whole batch, not necessarily their portion.",
       { fileData: { fileUri: "gs://snackbert-test.appspot.com/malkochen_dish_images/m3.jpg", mimeType: "image/jpeg" } },
-      "No portion input from the user: count one normal portion of this Dish.",
+      "No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.",
     ]);
   });
 
