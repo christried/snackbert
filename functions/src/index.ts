@@ -1,3 +1,7 @@
+import { onRequest } from "firebase-functions/v2/https";
+import { defineSecret } from "firebase-functions/params";
+import { handleMalkochenRequest } from "./malkochen/handler";
+import { firebaseMalkochenDeps } from "./malkochen/firebase-deps";
 import { HttpsError } from "firebase-functions/v2/https";
 import { beforeUserCreated } from "firebase-functions/v2/identity";
 import * as admin from "firebase-admin";
@@ -272,5 +276,34 @@ export const processPendingMeal = onDocumentCreated(
         errorMessage: (error as Error).message,
       });
     }
+  },
+);
+
+// One secret per caller (malkochen production, malkochen Staging), so either can be revoked alone.
+const malkochenSecretProduction = defineSecret("MALKOCHEN_SECRET_PRODUCTION");
+const malkochenSecretStaging = defineSecret("MALKOCHEN_SECRET_STAGING");
+
+// Only for malkochen's server: account check and Snackbert Reports.
+export const malkochen = onRequest(
+  {
+    region: "europe-west1",
+    secrets: [malkochenSecretProduction, malkochenSecretStaging],
+    invoker: "public", // callers prove themselves with their secret
+    maxInstances: 3,
+    timeoutSeconds: 60,
+    memory: "512MiB",
+  },
+  async (req, res) => {
+    const response = await handleMalkochenRequest(
+      {
+        method: req.method,
+        path: req.path,
+        authorization: req.get("authorization"),
+        contentType: req.get("content-type"),
+        body: req.rawBody ?? Buffer.alloc(0),
+      },
+      firebaseMalkochenDeps([malkochenSecretProduction.value(), malkochenSecretStaging.value()]),
+    );
+    res.status(response.status).json(response.body);
   },
 );
