@@ -267,8 +267,11 @@ export const processPendingMeal = onDocumentCreated(
         // DEBUGGING OUTPUT TRAIL DATA
         debugGroundingSources: groundingSources,
         debugSearchQueries: searchQueriesUsed,
-        debugUrlsRead: urlsRead,
-        debugResearchFindings: researchFindings,
+        // Only for malkochen Reports, so app meals stay as they were: shows
+        // how the Dish and the portion were weighed.
+        ...(data.malkochen
+          ? { debugUrlsRead: urlsRead, debugResearchFindings: researchFindings }
+          : {}),
       });
     } catch (error) {
       console.error("processPendingMeal error:", error);
