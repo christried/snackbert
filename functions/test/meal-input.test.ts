@@ -35,7 +35,7 @@ describe("buildResearchInput", () => {
 
     expect(buildResearchInput(meal, BUCKET)).toEqual([
       "Dish from malkochen (what the user cooked):\nTitle: Linsen-Dal",
-      "No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.",
+      "No portion input from the user: count one normal serving of this Dish, never the whole batch.",
     ]);
   });
 
@@ -59,7 +59,7 @@ describe("buildResearchInput", () => {
         "Creator: @koch",
       "Caption of the post (written by the post's author, not by the user; its amounts may be for the whole recipe, not one serving):\n" +
         "Mein Dal mit roten Linsen #vegan",
-      "No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.",
+      "No portion input from the user: count one normal serving of this Dish, never the whole batch.",
     ]);
   });
 
@@ -78,7 +78,7 @@ describe("buildResearchInput", () => {
       "Dish from malkochen (what the user cooked):\nTitle: Linsen-Dal",
       "The Dish's picture from the post: it shows the Dish as the post published it, maybe the whole batch (a full pot, a tray), not the user's portion.",
       { fileData: { fileUri: "gs://snackbert-test.appspot.com/malkochen_dish_images/m2.webp", mimeType: "image/webp" } },
-      "No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.",
+      "No portion input from the user: count one normal serving of this Dish, never the whole batch.",
     ]);
   });
 
@@ -97,7 +97,7 @@ describe("buildResearchInput", () => {
       "Dish from malkochen (what the user cooked):\nTitle: Linsen-Dal",
       "The user's own photo of the Dish as they cooked it: it may show the whole batch, not necessarily their portion.",
       { fileData: { fileUri: "gs://snackbert-test.appspot.com/malkochen_dish_images/m3.jpg", mimeType: "image/jpeg" } },
-      "No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.",
+      "No portion input from the user: count one normal serving of this Dish, never the whole batch.",
     ]);
   });
 

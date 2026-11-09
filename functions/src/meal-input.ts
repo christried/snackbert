@@ -96,7 +96,7 @@ export function buildResearchInput(meal: MealInput, bucketName: string): Researc
   const portion = portionParts(meal, bucketName, true);
   const parts = [...dishParts(dish, bucketName), ...portion];
   if (portion.length === 0)
-    parts.push("No portion input from the user: count one normal serving of this Dish, not the whole batch the post or a photo may show.");
+    parts.push("No portion input from the user: count one normal serving of this Dish, never the whole batch.");
   return parts;
 }
 
