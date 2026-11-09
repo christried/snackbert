@@ -1,12 +1,11 @@
-import { onRequest } from "firebase-functions/v2/https";
-import { defineSecret } from "firebase-functions/params";
-import { handleMalkochenRequest } from "./malkochen/handler";
-import { firebaseMalkochenDeps } from "./malkochen/firebase-deps";
-import { HttpsError } from "firebase-functions/v2/https";
+import { HttpsError, onRequest } from "firebase-functions/v2/https";
 import { beforeUserCreated } from "firebase-functions/v2/identity";
 import * as admin from "firebase-admin";
 import { FinishReason, ThinkingLevel, Type } from "@google/genai";
 import { onDocumentCreated } from "firebase-functions/v2/firestore";
+import { defineSecret } from "firebase-functions/params";
+import { handleMalkochenRequest } from "./malkochen/handler";
+import { firebaseMalkochenDeps } from "./malkochen/firebase-deps";
 
 const { GoogleGenAI } = require("@google/genai");
 

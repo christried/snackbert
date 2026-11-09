@@ -433,6 +433,31 @@ describe("POST /reports", () => {
     expect(res).toEqual({ status: 400, body: { error: "bad_request" } });
   });
 
+  it("returns 400 when cookedAt has no offset", async () => {
+    const { deps, state } = fakeDeps();
+    const report = { ...baseReport(), cookedAt: "2026-11-09T19:30:00.000" };
+    const res = await handleMalkochenRequest(await reportRequest({ report: JSON.stringify(report) }), deps);
+    expect(res).toEqual({ status: 400, body: { error: "bad_request" } });
+    expect(state.meals.size).toBe(0);
+  });
+
+  it("reads a cookedAt with a numeric offset", async () => {
+    const { deps, state } = fakeDeps();
+    const report = { ...baseReport(), cookedAt: "2026-11-09T19:30:00.000+01:00" };
+    const res = await handleMalkochenRequest(await reportRequest({ report: JSON.stringify(report) }), deps);
+    expect(res.status).toBe(201);
+    expect(state.meals.get("meal-1")?.date).toBe("2026-11-09T19:30:00.000");
+  });
+
+  it("returns 400 for multipart without a boundary", async () => {
+    const { deps } = fakeDeps();
+    const res = await handleMalkochenRequest(
+      { ...(await reportRequest()), contentType: "multipart/form-data" },
+      deps,
+    );
+    expect(res).toEqual({ status: 400, body: { error: "bad_request" } });
+  });
+
   it("returns 400 when the report is not JSON", async () => {
     const { deps } = fakeDeps();
     const res = await handleMalkochenRequest(await reportRequest({ report: "not json" }), deps);

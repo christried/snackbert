@@ -64,7 +64,7 @@ function mediaType(header: string | undefined): string {
   return (header ?? "").split(";")[0].trim().toLowerCase();
 }
 
-function error(status: number, code: string): MalkochenResponse {
+function errorResponse(status: number, code: string): MalkochenResponse {
   return { status, body: { error: code } };
 }
 
@@ -111,15 +111,19 @@ async function handleAccountCheck(
   return { status: 200, body: { exists: userId !== null } };
 }
 
+// What the Dish's image shows: the picture from the post, or a photo of the cooked Dish.
+type ImageKind = "post" | "ownPhoto";
+
 interface ReportDish {
   title: string;
   sourceUrl: string | null;
   platform: string | null;
   creator: string | null;
   caption: string | null;
-  imageKind: "post" | "ownPhoto" | null;
+  imageKind: ImageKind | null;
 }
 
+// Already trimmed where it matters.
 interface ReportBody {
   email: string;
   cookedAt: Date;
@@ -149,7 +153,12 @@ function parseReport(raw: string, hasDishImage: boolean): ReportBody {
 
   const { email, cookedAt, dish } = parsed;
   if (typeof email !== "string" || email.trim() === "") throw badRequest();
-  if (typeof cookedAt !== "string" || Number.isNaN(new Date(cookedAt).getTime())) {
+  // The time needs its offset ("Z" or "+01:00"); without one it would be read as the server's time zone.
+  if (
+    typeof cookedAt !== "string" ||
+    !/(Z|[+-]\d{2}:\d{2})$/i.test(cookedAt) ||
+    Number.isNaN(new Date(cookedAt).getTime())
+  ) {
     throw badRequest();
   }
   if (!isRecord(dish)) throw badRequest();
@@ -159,7 +168,7 @@ function parseReport(raw: string, hasDishImage: boolean): ReportBody {
   if (typeof dish.title !== "string" || dish.title.trim() === "") throw badRequest();
   if (charLength(dish.title) > 300) throw payloadTooLarge();
 
-  let imageKind: "post" | "ownPhoto" | null = null;
+  let imageKind: ImageKind | null = null;
   if (dish.imageKind === "post" || dish.imageKind === "ownPhoto") {
     imageKind = dish.imageKind;
   } else if (dish.imageKind !== undefined && dish.imageKind !== null) {
@@ -168,11 +177,11 @@ function parseReport(raw: string, hasDishImage: boolean): ReportBody {
   if ((imageKind !== null) !== hasDishImage) throw badRequest();
 
   return {
-    email,
+    email: email.trim(),
     cookedAt: new Date(cookedAt),
-    text,
+    text: text.trim(),
     dish: {
-      title: dish.title,
+      title: dish.title.trim(),
       sourceUrl: optionalString(dish.sourceUrl, 2000),
       platform: optionalString(dish.platform, 2000),
       creator: optionalString(dish.creator, 2000),
@@ -182,11 +191,16 @@ function parseReport(raw: string, hasDishImage: boolean): ReportBody {
   };
 }
 
+// An empty file is a bad request, one over `max` bytes too large.
+function checkSize(file: UploadedFile, max: number): void {
+  if (file.bytes.length === 0) throw badRequest();
+  if (file.bytes.length > max) throw payloadTooLarge();
+}
+
 // Photo: only image/jpeg, up to 3 MB.
 function checkPhoto(file: UploadedFile): StoredFile {
   if (mediaType(file.mimeType) !== "image/jpeg") throw unsupportedMediaType();
-  if (file.bytes.length === 0) throw badRequest();
-  if (file.bytes.length > PHOTO_MAX_BYTES) throw payloadTooLarge();
+  checkSize(file, PHOTO_MAX_BYTES);
   return { bytes: file.bytes, mimeType: "image/jpeg", ext: "jpg" };
 }
 
@@ -194,8 +208,7 @@ function checkPhoto(file: UploadedFile): StoredFile {
 function checkRecording(file: UploadedFile): StoredFile {
   const allowed = RECORDING_TYPES.get(mediaType(file.mimeType));
   if (!allowed) throw unsupportedMediaType();
-  if (file.bytes.length === 0) throw badRequest();
-  if (file.bytes.length > MEDIA_MAX_BYTES) throw payloadTooLarge();
+  checkSize(file, MEDIA_MAX_BYTES);
   return { bytes: file.bytes, ...allowed };
 }
 
@@ -204,8 +217,7 @@ function checkDishImage(file: UploadedFile): StoredFile {
   const type = mediaType(file.mimeType);
   const ext = DISH_IMAGE_EXTS.get(type);
   if (!ext) throw unsupportedMediaType();
-  if (file.bytes.length === 0) throw badRequest();
-  if (file.bytes.length > MEDIA_MAX_BYTES) throw payloadTooLarge();
+  checkSize(file, MEDIA_MAX_BYTES);
   return { bytes: file.bytes, mimeType: type, ext };
 }
 
@@ -224,34 +236,29 @@ async function handleReport(
   const recordingFile = recording ? checkRecording(recording) : null;
   const dishImageFile = dishImage ? checkDishImage(dishImage) : null;
 
-  const userId = await deps.findUserIdByEmail(report.email.trim());
-  if (userId === null) return error(404, "no_account");
+  const userId = await deps.findUserIdByEmail(report.email);
+  if (userId === null) return errorResponse(404, "no_account");
 
   // Take the daily slot before storing anything, so a refusal stores nothing.
+  // A store or write that fails afterwards still spends the slot: the limit
+  // guards the Vertex bill, so erring on the strict side is fine.
   const now = deps.now();
   const reserved = await deps.reserveDailyReport(userId, berlinDay(now), DAILY_REPORT_LIMIT);
-  if (!reserved) return error(429, "daily_limit");
+  if (!reserved) return errorResponse(429, "daily_limit");
 
   const mealId = deps.newId();
 
-  const imageUrl = photoFile
-    ? await deps.storeMedia(`meal_images/${mealId}.jpg`, photoFile.bytes, photoFile.mimeType)
-    : null;
-  const audioUrl = recordingFile
-    ? await deps.storeMedia(
-        `meal_audios/${mealId}.${recordingFile.ext}`,
-        recordingFile.bytes,
-        recordingFile.mimeType,
-      )
-    : null;
+  // Stores a file at its path and answers where it went; nothing when there is no file.
+  const store = async (folder: string, file: StoredFile | null) => {
+    if (!file) return null;
+    const path = `${folder}/${mealId}.${file.ext}`;
+    const url = await deps.storeMedia(path, file.bytes, file.mimeType);
+    return { path, url, mimeType: file.mimeType };
+  };
+  const photoStored = await store("meal_images", photoFile);
+  const recordingStored = await store("meal_audios", recordingFile);
   // The Dish's image is kept apart from the portion photo, which is all the app shows.
-  if (dishImageFile) {
-    await deps.storeMedia(
-      `malkochen_dish_images/${mealId}.${dishImageFile.ext}`,
-      dishImageFile.bytes,
-      dishImageFile.mimeType,
-    );
-  }
+  const dishImageStored = await store("malkochen_dish_images", dishImageFile);
 
   const { dish } = report;
   await deps.writeMeal(mealId, {
@@ -259,24 +266,24 @@ async function handleReport(
     userId,
     date: berlinWallClock(report.cookedAt),
     status: "pending",
-    inputText: report.text.trim(),
-    imagePath: photoFile ? `meal_images/${mealId}.jpg` : null,
-    imageUrl,
-    imageMimeType: photoFile ? photoFile.mimeType : null,
-    audioPath: recordingFile ? `meal_audios/${mealId}.${recordingFile.ext}` : null,
-    audioUrl,
-    audioMimeType: recordingFile ? recordingFile.mimeType : null,
+    inputText: report.text,
+    imagePath: photoStored?.path ?? null,
+    imageUrl: photoStored?.url ?? null,
+    imageMimeType: photoStored?.mimeType ?? null,
+    audioPath: recordingStored?.path ?? null,
+    audioUrl: recordingStored?.url ?? null,
+    audioMimeType: recordingStored?.mimeType ?? null,
     source: "malkochen",
     malkochen: {
       reportedAt: now.toISOString(),
       dish: {
-        title: dish.title.trim(),
+        title: dish.title,
         sourceUrl: dish.sourceUrl,
         platform: dish.platform,
         creator: dish.creator,
         caption: dish.caption,
-        imagePath: dishImageFile ? `malkochen_dish_images/${mealId}.${dishImageFile.ext}` : null,
-        imageMimeType: dishImageFile ? dishImageFile.mimeType : null,
+        imagePath: dishImageStored?.path ?? null,
+        imageMimeType: dishImageStored?.mimeType ?? null,
         imageKind: dish.imageKind,
       },
     },
@@ -287,7 +294,7 @@ async function handleReport(
 
 async function route(req: MalkochenRequest, deps: MalkochenDeps): Promise<MalkochenResponse> {
   // Authentication comes before routing, so unknown paths need a secret too.
-  if (!isAuthorized(req.authorization, deps.secrets)) return error(401, "unauthorized");
+  if (!isAuthorized(req.authorization, deps.secrets)) return errorResponse(401, "unauthorized");
 
   // One trailing slash is accepted.
   const path = req.path.length > 1 && req.path.endsWith("/") ? req.path.slice(0, -1) : req.path;
@@ -295,9 +302,9 @@ async function route(req: MalkochenRequest, deps: MalkochenDeps): Promise<Malkoc
   let handler: (req: MalkochenRequest, deps: MalkochenDeps) => Promise<MalkochenResponse>;
   if (path === "/account-check") handler = handleAccountCheck;
   else if (path === "/reports") handler = handleReport;
-  else return error(404, "not_found");
+  else return errorResponse(404, "not_found");
 
-  if (req.method !== "POST") return error(405, "method_not_allowed");
+  if (req.method !== "POST") return errorResponse(405, "method_not_allowed");
   return handler(req, deps);
 }
 
@@ -308,9 +315,9 @@ export async function handleMalkochenRequest(
   try {
     return await route(req, deps);
   } catch (caught) {
-    if (caught instanceof Rejection) return error(caught.status, caught.code);
+    if (caught instanceof Rejection) return errorResponse(caught.status, caught.code);
     // Log only the message: request bodies can contain personal data.
     console.error("malkochen handler error:", (caught as Error).message);
-    return error(500, "internal");
+    return errorResponse(500, "internal");
   }
 }

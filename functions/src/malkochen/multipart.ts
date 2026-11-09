@@ -29,18 +29,24 @@ export function parseMultipart(
   body: Buffer,
 ): Promise<MultipartForm> {
   return new Promise((resolve, reject) => {
-    const bb = busboy({
-      headers: { "content-type": contentType },
-      limits: {
-        fileSize: MAX_FILE_BYTES,
-        files: 3,
-        fields: 1,
-        // Busboy emits partsLimit when the Nth part finishes, so 4 (report + 3 files)
-        // would fire on every valid request. 5 fires only on a fifth part.
-        parts: 5,
-        fieldSize: 100 * 1024,
-      },
-    });
+    let bb: busboy.Busboy;
+    try {
+      bb = busboy({
+        headers: { "content-type": contentType },
+        limits: {
+          fileSize: MAX_FILE_BYTES,
+          files: 3,
+          fields: 1,
+          // Busboy emits partsLimit when the Nth part finishes, so 4 (report + 3 files)
+          // would fire on every valid request. 5 fires only on a fifth part.
+          parts: 5,
+          fieldSize: 100 * 1024,
+        },
+      });
+    } catch {
+      // Busboy throws right away on a malformed header, e.g. a missing boundary.
+      return reject(badRequest());
+    }
 
     let report: string | undefined;
     const files: MultipartForm["files"] = {};
